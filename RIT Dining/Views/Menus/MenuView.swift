@@ -200,6 +200,7 @@ struct MenuView: View {
                         }
                     } label: {
                         Image(systemName: "clock")
+                        Text("Meal Periods")
                     }
                 }
                 ToolbarItemGroup(placement: .bottomBar) {

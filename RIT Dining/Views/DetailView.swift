@@ -116,6 +116,7 @@ struct DetailView: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
+                        #if DEBUG
                         HStack(spacing: 0) {
                             ForEach(Range(1...5), id: \.self) { index in
                                 if occupancyPercentage > (20 * Double(index)) {
@@ -134,6 +135,7 @@ struct DetailView: View {
                         }
                         .foregroundStyle(Color.accent.opacity(occupancyLoading ? 0.5 : 1.0))
                         .font(.title3)
+                        #endif
                     }
                     Spacer()
                     VStack(alignment: .trailing) {
@@ -156,14 +158,16 @@ struct DetailView: View {
                                         .font(.title3)
                                 }
                             }
-                            // Open OnDemand. Unfortunately the locations use arbitrary IDs, so just open the main OnDemand page.
-                            Button(action: {
-                                openURL(URL(string: "https://ondemand.rit.edu")!)
-                            }) {
-                                Image(systemName: "cart")
-                                    .font(.title3)
-                            }
-                            .disabled(location.open == .closed || location.open == .openingSoon)
+// THIS FEATURE DISABLED AT RIT'S REQUEST FOR SECURITY REASONS.
+// No hard feelings or anything though, I get it.
+//                          // Open OnDemand. Unfortunately the locations use arbitrary IDs, so just open the main OnDemand page.
+//                            Button(action: {
+//                                openURL(URL(string: "https://ondemand.rit.edu")!)
+//                            }) {
+//                                Image(systemName: "cart")
+//                                    .font(.title3)
+//                            }
+//                            .disabled(location.open == .closed || location.open == .openingSoon)
                             // Open this location on the RIT map in embedded Safari.
                             Button(action: {
                                 showingSafari = true

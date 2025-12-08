@@ -31,6 +31,7 @@ struct ContentView: View {
     private func getDiningData() async {
         do {
             try await model.getHoursByDay()
+            await model.scheduleAllPushes()
             isLoading = false
         } catch {
             isLoading = true
@@ -126,7 +127,10 @@ struct ContentView: View {
                     await getDiningData()
                 }
                 .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
+                    ToolbarItemGroup(placement: .primaryAction) {
+                        NavigationLink(destination: VisitingChefPush()) {
+                            Image(systemName: "bell.badge")
+                        }
                         Menu {
                             Button(action: {
                                 Task {
@@ -135,16 +139,10 @@ struct ContentView: View {
                             }) {
                                 Label("Refresh", systemImage: "arrow.clockwise")
                             }
-                            // This is commented out because this feature is still not done. Sorry!
-//                            NavigationLink(destination: VisitingChefPush()) {
-//                                Image(systemName: "bell.badge")
-//                                    .foregroundColor(.accentColor)
-//                                Text("Notifications")
-//                            }
+                            
                             Divider()
                             NavigationLink(destination: AboutView()) {
                                 Image(systemName: "info.circle")
-                                    .foregroundColor(.accentColor)
                                 Text("About")
                             }
                             Button(action: {

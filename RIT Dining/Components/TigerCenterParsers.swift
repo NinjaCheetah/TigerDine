@@ -47,6 +47,10 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
         nil
     }
     
+    // Generate a maps URL from the mdoId key. This is required because the mapsUrl served by TigerCenter is not compatible with
+    // the new RIT map that was deployed in December 2025.
+    let mapsUrl = "https://maps.rit.edu/details/\(location.mdoId)"
+    
     // Early return if there are no events, good for things like the food trucks which can very easily have no openings in a week.
     if location.events.isEmpty {
         return DiningLocation(
@@ -56,7 +60,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
             name: location.name,
             summary: location.summary,
             desc: desc,
-            mapsUrl: location.mapsUrl,
+            mapsUrl: mapsUrl,
             date: forDate ?? Date(),
             diningTimes: nil,
             open: .closed,
@@ -102,7 +106,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
             name: location.name,
             summary: location.summary,
             desc: desc,
-            mapsUrl: location.mapsUrl,
+            mapsUrl: mapsUrl,
             date: forDate ?? Date(),
             diningTimes: nil,
             open: .closed,
@@ -179,7 +183,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                 print("found visiting chef: \(menu.name)")
                 var name: String = menu.name
                 let splitString = name.split(separator: "(", maxSplits: 1)
-                name = String(splitString[0])
+                name = String(splitString[0]).trimmingCharacters(in: .whitespaces)
                 // Time parsing nonsense starts here. Extracts the time from a string like "Chef (4-7p.m.)", splits it at the "-",
                 // strips the non-numerical characters from each part, parses it as a number and adds 12 hours as needed, then creates
                 // a Date instance for that time on today's date.
@@ -199,7 +203,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                         bySettingHour: openTimeComponents.hour!,
                         minute: openTimeComponents.minute!,
                         second: openTimeComponents.second!,
-                        of: now)!
+                        of: forDate ?? now)!
                 } else {
                     break
                 }
@@ -212,7 +216,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                         bySettingHour: closeTimeComponents.hour!,
                         minute: closeTimeComponents.minute!,
                         second: closeTimeComponents.second!,
-                        of: now)!
+                        of: forDate ?? now)!
                 } else {
                     break
                 }
@@ -261,7 +265,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
         name: location.name,
         summary: location.summary,
         desc: desc,
-        mapsUrl: location.mapsUrl,
+        mapsUrl: mapsUrl,
         date: forDate ?? Date(),
         diningTimes: diningTimes,
         open: openStatus,
