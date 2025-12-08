@@ -49,7 +49,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
     
     // Generate a maps URL from the mdoId key. This is required because the mapsUrl served by TigerCenter is not compatible with
     // the new RIT map that was deployed in December 2025.
-    let mapsUrl = "https://maps.rit.edu/details/\(location.mdoId)"
+    let mapsUrl = "https://maps.rit.edu/?mdo_id=\(location.mdoId)"
     
     // Early return if there are no events, good for things like the food trucks which can very easily have no openings in a week.
     if location.events.isEmpty {

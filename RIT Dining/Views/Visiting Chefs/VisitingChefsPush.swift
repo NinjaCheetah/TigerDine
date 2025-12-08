@@ -50,6 +50,13 @@ struct VisitingChefPush: View {
                         Text("3 Hours Before").tag(3)
                     }
                     .disabled(!pushAllowed || !pushEnabled)
+                    .onChange(of: notificationOffset) {
+                        Task {
+                            // If we changed the offset, we need to reschedule everything.
+                            await model.cancelAllPushes()
+                            await model.scheduleAllPushes()
+                        }
+                    }
                 }
                 Section(footer: Text("Get notified when and where a specific visiting chef will be on campus.")) {
                     ForEach(visitingChefs, id: \.self) { chef in
