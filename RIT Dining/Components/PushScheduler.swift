@@ -23,6 +23,7 @@ func scheduleVisitingChefNotif(name: String, location: String, startTime: Date, 
         content.title = "\(name) Is On Campus Today"
     }
     content.body = "\(name) will be at \(location) from \(dateDisplay.string(from: startTime))-\(dateDisplay.string(from: endTime))"
+    content.sound = .default
     
     // Get the time that we're going to schedule the notification for, which is a specified number of hours before the chef
     // shows up. This is configurable from the notification settings.

@@ -129,7 +129,7 @@ struct VisitingChefPush: View {
             Task {
                 let center = UNUserNotificationCenter.current()
                 do {
-                    try await center.requestAuthorization(options: [.alert])
+                    try await center.requestAuthorization(options: [.alert, .sound])
                 } catch {
                     print(error)
                 }
