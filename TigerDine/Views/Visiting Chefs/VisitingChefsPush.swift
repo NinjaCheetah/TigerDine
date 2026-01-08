@@ -10,8 +10,11 @@ import SwiftUI
 struct VisitingChefPush: View {
     @AppStorage("visitingChefPushEnabled") var pushEnabled: Bool = false
     @AppStorage("notificationOffset") var notificationOffset: Int = 2
+    
     @Environment(DiningModel.self) var model
+    
     @State private var pushAllowed: Bool = false
+    
     private let visitingChefs = [
         "California Rollin' Sushi",
         "D'Mangu",

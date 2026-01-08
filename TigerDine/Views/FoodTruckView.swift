@@ -66,19 +66,9 @@ struct FoodTruckView: View {
         } else {
             ScrollView {
                 VStack(alignment: .leading) {
-                    HStack {
-                        Text("Weekend Food Trucks")
-                            .font(.title)
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Button(action: {
-                            showingSafari = true
-                        }) {
-                            Image(systemName: "network")
-                                .foregroundStyle(.accent)
-                                .font(.title3)
-                        }
-                    }
+                    Text("Weekend Food Trucks")
+                        .font(.title)
+                        .fontWeight(.semibold)
                     ForEach(foodTruckEvents, id: \.self) { event in
                         Divider()
                         Text(visitingChefDateDisplay.string(from: event.date))
@@ -92,10 +82,19 @@ struct FoodTruckView: View {
                         Spacer()
                     }
                     Spacer()
-                    Text("Food truck data is sourced directly from the RIT Events website, and may not be presented correctly. Use the button in the top right to access the RIT Events website directly to see the original source of the information.")
+                    Text("Food truck data is sourced directly from the RIT Events website, and may not be presented correctly. Use the globe button in the top right to access the RIT Events website directly to see the original source of the information.")
                         .foregroundStyle(.secondary)
                 }
                 .padding(.horizontal, 8)
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button(action: {
+                        showingSafari = true
+                    }) {
+                        Image(systemName: "network")
+                    }
+                }
             }
             .sheet(isPresented: $showingSafari) {
                 SafariView(url: URL(string: "https://www.rit.edu/events/weekend-food-trucks")!)

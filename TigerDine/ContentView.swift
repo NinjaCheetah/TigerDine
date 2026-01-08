@@ -11,14 +11,12 @@ struct ContentView: View {
     // Save sort/filter options in AppStorage so that they actually get saved.
     @AppStorage("openLocationsOnly") var openLocationsOnly: Bool = false
     @AppStorage("openLocationsFirst") var openLocationsFirst: Bool = false
-    @State private var favorites = Favorites()
-    @State private var notifyingChefs = NotifyingChefs()
+    
     @State private var model = DiningModel()
     @State private var isLoading: Bool = true
     @State private var loadFailed: Bool = false
     @State private var showingDonationSheet: Bool = false
     @State private var rotationDegrees: Double = 0
-    @State private var diningLocations: [DiningLocation] = []
     @State private var searchText: String = ""
     
     private var animation: Animation {
@@ -176,8 +174,6 @@ struct ContentView: View {
                 }
             }
         }
-        .environment(favorites)
-        .environment(notifyingChefs)
         .environment(model)
         .task {
             await getDiningData()

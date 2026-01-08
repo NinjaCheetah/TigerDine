@@ -44,7 +44,7 @@ class VisitingChefPushesModel {
         }
     }
     
-    /// Cancel all reigstered push notifications for a specified visiting chef.
+    /// Cancels all reigstered push notifications for a specified visiting chef.
     func cancelPushesForChef(name: String) {
         var uuids: [String] = []
         for push in pushes {
@@ -60,6 +60,7 @@ class VisitingChefPushesModel {
         save()
     }
     
+    /// Checks if a push notification meeting the specified criteria is already scheduled.
     func pushAlreadyRegisered(name: String, location: String, startTime: Date, endTime: Date) -> Bool {
         for push in pushes {
             if push.name == name && push.location == location && push.startTime == startTime && push.endTime == endTime {
@@ -69,6 +70,7 @@ class VisitingChefPushesModel {
         return false
     }
 
+    /// Write out the registered push notifications.
     private func save() {
         let encoder = JSONEncoder()
         if let data = try? encoder.encode(pushes) {
@@ -76,6 +78,7 @@ class VisitingChefPushesModel {
         }
     }
 
+    /// Load registered push notifications.
     private func load() {
         let decoder = JSONDecoder()
         if let data = UserDefaults.standard.data(forKey: key),

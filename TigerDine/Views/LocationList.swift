@@ -14,7 +14,8 @@ struct LocationList: View {
     @Binding var openLocationsFirst: Bool
     @Binding var openLocationsOnly: Bool
     @Binding var searchText: String
-    @Environment(Favorites.self) var favorites
+    
+    @Environment(DiningModel.self) var model
     
     // The dining locations need to be sorted before being displayed. Favorites should always be shown first, followed by non-favorites.
     // Afterwards, filters the sorted list based on any current search text and the "open locations only" filtering option.
@@ -29,8 +30,8 @@ struct LocationList: View {
             return name
         }
         newLocations.sort { firstLoc, secondLoc in
-            let firstLocIsFavorite = favorites.contains(firstLoc)
-            let secondLocIsFavorite = favorites.contains(secondLoc)
+            let firstLocIsFavorite = model.favorites.contains(firstLoc)
+            let secondLocIsFavorite = model.favorites.contains(secondLoc)
             // Favorites get priority!
             if firstLocIsFavorite != secondLocIsFavorite {
                 return firstLocIsFavorite && !secondLocIsFavorite
@@ -61,7 +62,7 @@ struct LocationList: View {
                 VStack(alignment: .leading) {
                     HStack {
                         Text(location.name)
-                        if favorites.contains(location) {
+                        if model.favorites.contains(location) {
                             Image(systemName: "star.fill")
                                 .foregroundStyle(.yellow)
                         }
@@ -94,21 +95,21 @@ struct LocationList: View {
             .swipeActions {
                 Button(action: {
                     withAnimation {
-                        if favorites.contains(location) {
-                            favorites.remove(location)
+                        if model.favorites.contains(location) {
+                            model.favorites.remove(location)
                         } else {
-                            favorites.add(location)
+                            model.favorites.add(location)
                         }
                     }
                     
                 }) {
-                    if favorites.contains(location) {
+                    if model.favorites.contains(location) {
                         Label("Unfavorite", systemImage: "star")
                     } else {
                         Label("Favorite", systemImage: "star")
                     }
                 }
-                .tint(favorites.contains(location) ? .yellow : nil)
+                .tint(model.favorites.contains(location) ? .yellow : nil)
             }
         }
     }

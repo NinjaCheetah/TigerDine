@@ -12,13 +12,13 @@ class DiningModel {
     var locationsByDay = [[DiningLocation]]()
     var daysRepresented = [Date]()
     var lastRefreshed: Date?
-    var visitingChefPushes = VisitingChefPushesModel()
-    var notifyingChefs = NotifyingChefs()
     
-    // This is the actual method responsible for making requests to the API for the current day and next 6 days to collect all
-    // of the information that the app needs for the various view. Making it part of the model allows it to be updated from
-    // any view at any time, and prevents excess API requests (if you never refresh, the app will never need to make more than 7
-    // calls per launch).
+    // External models that should be nested under this one.
+    var favorites = Favorites()
+    var notifyingChefs = NotifyingChefs()
+    var visitingChefPushes = VisitingChefPushesModel()
+    
+    /// This is the actual method responsible for making requests to the API for the current day and next 6 days to collect all of the information that the app needs for the various view. Making it part of the model allows it to be updated from any view at any time, and prevents excess API requests (if you never refresh, the app will never need to make more than 7 calls per launch).
     func getHoursByDay() async throws {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -47,8 +47,7 @@ class DiningModel {
         lastRefreshed = Date()
     }
     
-    // Iterates through all of the locations and updates their open status indicator based on the current time. Does a replace
-    // to make sure that it updates any views observing this model.
+    /// Iterates through all of the locations and updates their open status indicator based on the current time. Does a replace to make sure that it updates any views observing this model.
     func updateOpenStatuses() {
         locationsByDay = locationsByDay.map { day in
             day.map { location in
@@ -59,6 +58,7 @@ class DiningModel {
         }
     }
     
+    /// Schedules and saves push notifications for all enabled visiting chefs.
     func scheduleAllPushes() async {
         for day in locationsByDay {
             for location in day {
@@ -80,7 +80,7 @@ class DiningModel {
         await cleanupPushes()
     }
     
-    // Cleanup old push notifications that have already gone by so we're not still tracking them forever and ever.
+    /// Cleans up old push notifications that have already been delivered so that we're not still tracking them forever.
     func cleanupPushes() async {
         let now = Date()
         for push in visitingChefPushes.pushes {
@@ -90,12 +90,14 @@ class DiningModel {
         }
     }
     
+    /// Cancels all pending push notifications. Used when disabling push notifications as a whole.
     func cancelAllPushes() async {
         let uuids = visitingChefPushes.pushes.map(\.uuid)
         await cancelVisitingChefNotifs(uuids: uuids)
         visitingChefPushes.pushes.removeAll()
     }
     
+    /// Schedules and saves push notifications for a specific visiting chef.
     func schedulePushesForChef(_ chefName: String) async {
         for day in locationsByDay {
             for location in day {

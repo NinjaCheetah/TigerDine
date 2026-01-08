@@ -10,9 +10,10 @@ import SafariServices
 
 struct DetailView: View {
     @State var locationId: Int
-    @Environment(Favorites.self) var favorites
+    
     @Environment(DiningModel.self) var model
     @Environment(\.openURL) private var openURL
+    
     @State private var showingSafari: Bool = false
     @State private var occupancyLoading: Bool = true
     @State private var occupancyPercentage: Double = 0.0
@@ -78,112 +79,63 @@ struct DetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                HStack(alignment: .center) {
+                VStack(alignment: .leading) {
+                    Text(location.name)
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text(location.summary)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
                     VStack(alignment: .leading) {
-                        Text(location.name)
-                            .font(.title)
-                            .fontWeight(.bold)
-                        Text(location.summary)
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.secondary)
-                        VStack(alignment: .leading) {
-                            switch location.open {
-                            case .open:
-                                Text("Open")
-                                    .font(.title3)
-                                    .foregroundStyle(.green)
-                            case .closed:
-                                Text("Closed")
-                                    .font(.title3)
-                                    .foregroundStyle(.red)
-                            case .openingSoon:
-                                Text("Opening Soon")
-                                    .font(.title3)
-                                    .foregroundStyle(.orange)
-                            case .closingSoon:
-                                Text("Closing Soon")
-                                    .font(.title3)
-                                    .foregroundStyle(.orange)
-                            }
-                            if let times = location.diningTimes, !times.isEmpty {
-                                ForEach(times, id: \.self) { time in
-                                    Text("\(dateDisplay.string(from: time.openTime)) - \(dateDisplay.string(from: time.closeTime))")
-                                        .foregroundStyle(.secondary)
-                                }
-                            } else {
-                                Text("Not Open Today")
+                        switch location.open {
+                        case .open:
+                            Text("Open")
+                                .font(.title3)
+                                .foregroundStyle(.green)
+                        case .closed:
+                            Text("Closed")
+                                .font(.title3)
+                                .foregroundStyle(.red)
+                        case .openingSoon:
+                            Text("Opening Soon")
+                                .font(.title3)
+                                .foregroundStyle(.orange)
+                        case .closingSoon:
+                            Text("Closing Soon")
+                                .font(.title3)
+                                .foregroundStyle(.orange)
+                        }
+                        if let times = location.diningTimes, !times.isEmpty {
+                            ForEach(times, id: \.self) { time in
+                                Text("\(dateDisplay.string(from: time.openTime)) - \(dateDisplay.string(from: time.closeTime))")
                                     .foregroundStyle(.secondary)
                             }
+                        } else {
+                            Text("Not Open Today")
+                                .foregroundStyle(.secondary)
                         }
-                        #if DEBUG
-                        HStack(spacing: 0) {
-                            ForEach(Range(1...5), id: \.self) { index in
-                                if occupancyPercentage > (20 * Double(index)) {
-                                    Image(systemName: "person.fill")
-                                } else {
-                                    Image(systemName: "person")
-                                }
-                            }
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .frame(width: 18, height: 18)
-                                .opacity(occupancyLoading ? 1 : 0)
-                                .task {
-                                    await getOccupancy()
-                                }
-                        }
-                        .foregroundStyle(Color.accent.opacity(occupancyLoading ? 0.5 : 1.0))
-                        .font(.title3)
-                        #endif
                     }
-                    Spacer()
-                    VStack(alignment: .trailing) {
-                        HStack(alignment: .center) {
-                            // Favorites toggle button.
-                            Button(action: {
-                                if favorites.contains(location) {
-                                    favorites.remove(location)
-                                } else {
-                                    favorites.add(location)
-                                }
-                            }) {
-                                if favorites.contains(location) {
-                                    Image(systemName: "star.fill")
-                                        .foregroundStyle(.yellow)
-                                        .font(.title3)
-                                } else {
-                                    Image(systemName: "star")
-                                        .foregroundStyle(.yellow)
-                                        .font(.title3)
-                                }
-                            }
-// THIS FEATURE DISABLED AT RIT'S REQUEST FOR SECURITY REASONS.
-// No hard feelings or anything though, I get it.
-//                          // Open OnDemand. Unfortunately the locations use arbitrary IDs, so just open the main OnDemand page.
-//                            Button(action: {
-//                                openURL(URL(string: "https://ondemand.rit.edu")!)
-//                            }) {
-//                                Image(systemName: "cart")
-//                                    .font(.title3)
-//                            }
-//                            .disabled(location.open == .closed || location.open == .openingSoon)
-                            // Open this location on the RIT map in embedded Safari.
-                            Button(action: {
-                                showingSafari = true
-                            }) {
-                                Image(systemName: "map")
-                                    .font(.title3)
+                    #if DEBUG
+                    HStack(spacing: 0) {
+                        ForEach(Range(1...5), id: \.self) { index in
+                            if occupancyPercentage > (20 * Double(index)) {
+                                Image(systemName: "person.fill")
+                            } else {
+                                Image(systemName: "person")
                             }
                         }
-                        if let fdmpIds = location.fdmpIds {
-                            NavigationLink(destination: MenuView(accountId: fdmpIds.accountId, locationId: fdmpIds.locationId)) {
-                                Text("View Menu")
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .frame(width: 18, height: 18)
+                            .opacity(occupancyLoading ? 1 : 0)
+                            .task {
+                                await getOccupancy()
                             }
-                            .padding(.top, 5)
-                        }
-                        Spacer()
                     }
+                    .foregroundStyle(Color.accent.opacity(occupancyLoading ? 0.5 : 1.0))
+                    .font(.title3)
+                    #endif
                 }
                 .padding(.bottom, 12)
                 if let visitingChefs = location.visitingChefs, !visitingChefs.isEmpty {
@@ -267,6 +219,50 @@ struct DetailView: View {
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 8)
+            .toolbar {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    // Favorites toggle button.
+                    Button(action: {
+                        if model.favorites.contains(location) {
+                            model.favorites.remove(location)
+                        } else {
+                            model.favorites.add(location)
+                        }
+                    }) {
+                        if model.favorites.contains(location) {
+                            Image(systemName: "star.fill")
+                                .foregroundStyle(.yellow)
+                                //.font(.title3)
+                        } else {
+                            Image(systemName: "star")
+                                .foregroundStyle(.yellow)
+                                //.font(.title3)
+                        }
+                    }
+// THIS FEATURE DISABLED AT RIT'S REQUEST FOR SECURITY REASONS.
+// No hard feelings or anything though, I get it.
+//                          // Open OnDemand. Unfortunately the locations use arbitrary IDs, so just open the main OnDemand page.
+//                            Button(action: {
+//                                openURL(URL(string: "https://ondemand.rit.edu")!)
+//                            }) {
+//                                Image(systemName: "cart")
+//                                    .font(.title3)
+//                            }
+//                            .disabled(location.open == .closed || location.open == .openingSoon)
+                    // Open this location on the RIT map in embedded Safari.
+                    Button(action: {
+                        showingSafari = true
+                    }) {
+                        Image(systemName: "map")
+                            //.font(.title3)
+                    }
+                    if let fdmpIds = location.fdmpIds {
+                        NavigationLink(destination: MenuView(accountId: fdmpIds.accountId, locationId: fdmpIds.locationId)) {
+                            Image(systemName: "menucard")
+                        }
+                    }
+                }
+            }
         }
         .navigationTitle("Details")
         .navigationBarTitleDisplayMode(.inline)

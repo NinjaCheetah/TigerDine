@@ -14,9 +14,22 @@
 		376AE05B2E6495EB00AB698B /* TigerDine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TigerDine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		37C76ABF2F0F3067009E7074 /* Exceptions for "TigerDine" folder in "TigerDine" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 376AE05A2E6495EB00AB698B /* TigerDine */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		376AE05D2E6495EB00AB698B /* TigerDine */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				37C76ABF2F0F3067009E7074 /* Exceptions for "TigerDine" folder in "TigerDine" target */,
+			);
 			path = TigerDine;
 			sourceTree = "<group>";
 		};
@@ -269,9 +282,11 @@
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TigerDine/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TigerDine;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025-2026 Campbell Bagley";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -282,7 +297,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "dev.ninjacheetah.RIT-Dining";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -304,9 +319,11 @@
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TigerDine/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TigerDine;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025-2026 Campbell Bagley";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -317,7 +334,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "dev.ninjacheetah.RIT-Dining";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

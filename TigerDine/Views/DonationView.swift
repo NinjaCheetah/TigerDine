@@ -15,24 +15,28 @@ struct DonationView: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .center, spacing: 12) {
-                HStack {
-                    if #available(iOS 26.0, *) {
-                        Image(systemName: "heart.fill")
-                            .foregroundStyle(.red)
-                            .symbolEffect(.drawOn, isActive: symbolDrawn)
-                            .onAppear {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                    symbolDrawn = false
-                                }
+                if #available(iOS 26.0, *) {
+                    Image(systemName: "heart.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                        .foregroundStyle(.red)
+                        .symbolEffect(.drawOn, isActive: symbolDrawn)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                symbolDrawn = false
                             }
-                    } else {
-                        Image(systemName: "heart.fill")
-                            .foregroundStyle(.red)
-                    }
-                    Text("Donate")
-                        .fontWeight(.bold)
+                        }
+                } else {
+                    Image(systemName: "heart.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                        .foregroundStyle(.red)
                 }
-                .font(.title)
+                Text("Donate")
+                    .fontWeight(.bold)
+                    .font(.title)
                 Text("The TigerDine app is free and open source software!")
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
@@ -76,7 +80,7 @@ struct DonationView: View {
                         VStack(alignment: .leading) {
                             Text("Send Me Money Directly")
                                 .fontWeight(.bold)
-                            Text("I have nothing specific to say here!")
+                            Text("PayPal won't take a cut!")
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.leading)
                         }
@@ -91,7 +95,7 @@ struct DonationView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
             .toolbar {
                 Button(action: {
                     dismiss()
