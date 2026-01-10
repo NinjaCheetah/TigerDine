@@ -10,7 +10,6 @@ import SwiftUI
 // This view handles the actual location list, because having it inside ContentView was too complex (both visually and for the
 // type checker too, apparently).
 struct LocationList: View {
-    @Binding var diningLocations: [DiningLocation]
     @Binding var openLocationsFirst: Bool
     @Binding var openLocationsOnly: Bool
     @Binding var searchText: String
@@ -20,7 +19,7 @@ struct LocationList: View {
     // The dining locations need to be sorted before being displayed. Favorites should always be shown first, followed by non-favorites.
     // Afterwards, filters the sorted list based on any current search text and the "open locations only" filtering option.
     private var filteredLocations: [DiningLocation] {
-        var newLocations = diningLocations
+        var newLocations = model.locationsByDay[0]
         // Because "The Commons" should be C for "Commons" and not T for "The".
         func removeThe(_ name: String) -> String {
             let lowercased = name.lowercased()

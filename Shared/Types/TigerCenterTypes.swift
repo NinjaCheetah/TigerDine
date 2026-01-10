@@ -49,7 +49,7 @@ struct DiningLocationsParser: Decodable {
 }
 
 /// Enum to represent the four possible states a given location can be in.
-enum OpenStatus {
+enum OpenStatus: Codable {
     case open
     case closed
     case openingSoon
@@ -57,13 +57,13 @@ enum OpenStatus {
 }
 
 /// An individual open period for a location.
-struct DiningTimes: Equatable, Hashable {
+struct DiningTimes: Equatable, Hashable, Codable {
     var openTime: Date
     var closeTime: Date
 }
 
 /// Enum to represent the five possible states a visiting chef can be in.
-enum VisitingChefStatus {
+enum VisitingChefStatus: Codable {
     case hereNow
     case gone
     case arrivingLater
@@ -72,7 +72,7 @@ enum VisitingChefStatus {
 }
 
 /// A visiting chef present at a location.
-struct VisitingChef: Equatable, Hashable {
+struct VisitingChef: Equatable, Hashable, Codable {
     let name: String
     let description: String
     var openTime: Date
@@ -81,19 +81,19 @@ struct VisitingChef: Equatable, Hashable {
 }
 
 /// A daily special at a location.
-struct DailySpecial: Equatable, Hashable {
+struct DailySpecial: Equatable, Hashable, Codable {
     let name: String
     let type: String
 }
 
 /// The IDs required to get the menu for a location from FD MealPlanner. Only present if the location appears in the map.
-struct FDMPIds: Hashable {
+struct FDMPIds: Hashable, Codable {
     let locationId: Int
     let accountId: Int
 }
 
 /// The basic information about a dining location needed to display it in the app after parsing is finished.
-struct DiningLocation: Identifiable, Hashable {
+struct DiningLocation: Identifiable, Hashable, Codable {
     let id: Int
     let mdoId: Int
     let fdmpIds: FDMPIds?

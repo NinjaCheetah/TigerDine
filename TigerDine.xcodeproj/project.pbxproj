@@ -8,13 +8,58 @@
 
 /* Begin PBXBuildFile section */
 		371FE8FE2E937040005A6BBD /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 371FE8FD2E937040005A6BBD /* SwiftSoup */; };
+		374CDA5B2F10A19500D8C50A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 374CDA5A2F10A19500D8C50A /* WidgetKit.framework */; };
+		374CDA5D2F10A19500D8C50A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 374CDA5C2F10A19500D8C50A /* SwiftUI.framework */; };
+		374CDA682F10A19600D8C50A /* TigerDineWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 374CDA582F10A19500D8C50A /* TigerDineWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		374CDA662F10A19600D8C50A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 376AE0532E6495EB00AB698B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 374CDA572F10A19500D8C50A;
+			remoteInfo = OpenWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		374CDA692F10A19600D8C50A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				374CDA682F10A19600D8C50A /* TigerDineWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		374CDA582F10A19500D8C50A /* TigerDineWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TigerDineWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		374CDA5A2F10A19500D8C50A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		374CDA5C2F10A19500D8C50A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		376AE05B2E6495EB00AB698B /* TigerDine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TigerDine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		374CDA6D2F10A19600D8C50A /* Exceptions for "TigerDineWidgets" folder in "TigerDineWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 374CDA572F10A19500D8C50A /* TigerDineWidgets */;
+		};
+		374CDA742F10B24F00D8C50A /* Exceptions for "Shared" folder in "TigerDineWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SharedComponents.swift,
+				Types/TigerCenterTypes.swift,
+			);
+			target = 374CDA572F10A19500D8C50A /* TigerDineWidgets */;
+		};
 		37C76ABF2F0F3067009E7074 /* Exceptions for "TigerDine" folder in "TigerDine" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -25,6 +70,22 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		374CDA5E2F10A19500D8C50A /* TigerDineWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				374CDA6D2F10A19600D8C50A /* Exceptions for "TigerDineWidgets" folder in "TigerDineWidgets" target */,
+			);
+			path = TigerDineWidgets;
+			sourceTree = "<group>";
+		};
+		374CDA722F10B22D00D8C50A /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				374CDA742F10B24F00D8C50A /* Exceptions for "Shared" folder in "TigerDineWidgets" target */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		376AE05D2E6495EB00AB698B /* TigerDine */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -36,6 +97,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		374CDA552F10A19500D8C50A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				374CDA5D2F10A19500D8C50A /* SwiftUI.framework in Frameworks */,
+				374CDA5B2F10A19500D8C50A /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		376AE0582E6495EB00AB698B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -47,10 +117,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		374CDA592F10A19500D8C50A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				374CDA5A2F10A19500D8C50A /* WidgetKit.framework */,
+				374CDA5C2F10A19500D8C50A /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		376AE0522E6495EB00AB698B = {
 			isa = PBXGroup;
 			children = (
+				374CDA722F10B22D00D8C50A /* Shared */,
 				376AE05D2E6495EB00AB698B /* TigerDine */,
+				374CDA5E2F10A19500D8C50A /* TigerDineWidgets */,
+				374CDA592F10A19500D8C50A /* Frameworks */,
 				376AE05C2E6495EB00AB698B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -59,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				376AE05B2E6495EB00AB698B /* TigerDine.app */,
+				374CDA582F10A19500D8C50A /* TigerDineWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -66,6 +149,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		374CDA572F10A19500D8C50A /* TigerDineWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 374CDA6C2F10A19600D8C50A /* Build configuration list for PBXNativeTarget "TigerDineWidgets" */;
+			buildPhases = (
+				374CDA542F10A19500D8C50A /* Sources */,
+				374CDA552F10A19500D8C50A /* Frameworks */,
+				374CDA562F10A19500D8C50A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				374CDA5E2F10A19500D8C50A /* TigerDineWidgets */,
+			);
+			name = TigerDineWidgets;
+			packageProductDependencies = (
+			);
+			productName = OpenWidgetExtension;
+			productReference = 374CDA582F10A19500D8C50A /* TigerDineWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		376AE05A2E6495EB00AB698B /* TigerDine */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 376AE0662E6495EC00AB698B /* Build configuration list for PBXNativeTarget "TigerDine" */;
@@ -73,12 +178,15 @@
 				376AE0572E6495EB00AB698B /* Sources */,
 				376AE0582E6495EB00AB698B /* Frameworks */,
 				376AE0592E6495EB00AB698B /* Resources */,
+				374CDA692F10A19600D8C50A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				374CDA672F10A19600D8C50A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				374CDA722F10B22D00D8C50A /* Shared */,
 				376AE05D2E6495EB00AB698B /* TigerDine */,
 			);
 			name = TigerDine;
@@ -96,9 +204,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					374CDA572F10A19500D8C50A = {
+						CreatedOnToolsVersion = 26.2;
+					};
 					376AE05A2E6495EB00AB698B = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -122,11 +233,19 @@
 			projectRoot = "";
 			targets = (
 				376AE05A2E6495EB00AB698B /* TigerDine */,
+				374CDA572F10A19500D8C50A /* TigerDineWidgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		374CDA562F10A19500D8C50A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		376AE0592E6495EB00AB698B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,6 +256,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		374CDA542F10A19500D8C50A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		376AE0572E6495EB00AB698B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -146,7 +272,81 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		374CDA672F10A19600D8C50A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 374CDA572F10A19500D8C50A /* TigerDineWidgets */;
+			targetProxy = 374CDA662F10A19600D8C50A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		374CDA6A2F10A19600D8C50A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = TigerDineWidgets/TigerDineWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 26;
+				DEVELOPMENT_TEAM = 5GF7GKNTK4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TigerDineWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TigerDineWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "dev.ninjacheetah.RIT-Dining.Widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		374CDA6B2F10A19600D8C50A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = TigerDineWidgets/TigerDineWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 26;
+				DEVELOPMENT_TEAM = 5GF7GKNTK4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TigerDineWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TigerDineWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "dev.ninjacheetah.RIT-Dining.Widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		376AE0642E6495EC00AB698B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -278,7 +478,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDine/TigerDine.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -315,7 +515,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDine/TigerDine.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -347,6 +547,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		374CDA6C2F10A19600D8C50A /* Build configuration list for PBXNativeTarget "TigerDineWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				374CDA6A2F10A19600D8C50A /* Debug */,
+				374CDA6B2F10A19600D8C50A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		376AE0562E6495EB00AB698B /* Build configuration list for PBXProject "TigerDine" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

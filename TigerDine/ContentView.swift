@@ -11,8 +11,9 @@ struct ContentView: View {
     // Save sort/filter options in AppStorage so that they actually get saved.
     @AppStorage("openLocationsOnly") var openLocationsOnly: Bool = false
     @AppStorage("openLocationsFirst") var openLocationsFirst: Bool = false
+
+    @Environment(DiningModel.self) var model
     
-    @State private var model = DiningModel()
     @State private var isLoading: Bool = true
     @State private var loadFailed: Bool = false
     @State private var showingDonationSheet: Bool = false
@@ -26,10 +27,14 @@ struct ContentView: View {
     }
     
     // Small wrapper around the method on the model so that errors can be handled by showing the uh error screen.
-    private func getDiningData() async {
+    private func getDiningData(bustCache: Bool = false) async {
         do {
-            try await model.getHoursByDay()
-            await model.scheduleAllPushes()
+            if bustCache {
+                try await model.getHoursByDay()
+            }
+            else {
+                try await model.getHoursByDayCached()
+            }
             isLoading = false
         } catch {
             isLoading = true
@@ -68,7 +73,7 @@ struct ContentView: View {
                         Button(action: {
                             loadFailed = false
                             Task {
-                                await getDiningData()
+                                await getDiningData(bustCache: true)
                             }
                         }) {
                             Label("Refresh", systemImage: "arrow.clockwise")
@@ -102,12 +107,14 @@ struct ContentView: View {
                             }
                         })
                         Section(content: {
-                            LocationList(
-                                diningLocations: $model.locationsByDay[0],
-                                openLocationsFirst: $openLocationsFirst,
-                                openLocationsOnly: $openLocationsOnly,
-                                searchText: $searchText
-                            )
+                            // Prevents crashing if the list is empty. Which shouldn't ever happen but still.
+                            if !model.locationsByDay.isEmpty {
+                                LocationList(
+                                    openLocationsFirst: $openLocationsFirst,
+                                    openLocationsOnly: $openLocationsOnly,
+                                    searchText: $searchText
+                                )
+                            }
                         }, footer: {
                             if let lastRefreshed = model.lastRefreshed {
                                 VStack(alignment: .center) {
@@ -122,7 +129,7 @@ struct ContentView: View {
                 .navigationTitle("TigerDine")
                 .searchable(text: $searchText, prompt: "Search")
                 .refreshable {
-                    await getDiningData()
+                    await getDiningData(bustCache: true)
                 }
                 .toolbar {
                     ToolbarItemGroup(placement: .primaryAction) {
@@ -132,7 +139,7 @@ struct ContentView: View {
                         Menu {
                             Button(action: {
                                 Task {
-                                    await getDiningData()
+                                    await getDiningData(bustCache: true)
                                 }
                             }) {
                                 Label("Refresh", systemImage: "arrow.clockwise")
@@ -174,7 +181,6 @@ struct ContentView: View {
                 }
             }
         }
-        .environment(model)
         .task {
             await getDiningData()
             await updateOpenStatuses()
