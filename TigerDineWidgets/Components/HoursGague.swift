@@ -40,8 +40,11 @@ struct OpeningHoursGauge: View {
         GeometryReader { geometry in
             let width = geometry.size.width
             let barHeight: CGFloat = 16
+            
+            let startOfToday = Calendar.current.startOfDay(for: now)
+            let startOfTomorrow = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
 
-            let nowX = position(for: now, width: width)
+            let nowX = position(for: now, start: startOfToday, width: width)
 
             ZStack(alignment: .leading) {
                 Capsule()
@@ -51,8 +54,12 @@ struct OpeningHoursGauge: View {
                 // We can skip drawing this entire capsule if the location is never open, since there would be no opening period
                 // to draw.
                 if let openTime = openTime, let closeTime = closeTime {
-                    let openX = position(for: openTime, width: width)
-                    let closeX = position(for: closeTime, width: width)
+                    let openX = position(for: openTime, start: startOfToday, width: width)
+                    let closeX = position(
+                        for: closeTime,
+                        start: closeTime < openTime ? startOfTomorrow : startOfToday,
+                        width: width
+                    )
                     
                     Capsule()
                         .fill(
@@ -77,10 +84,9 @@ struct OpeningHoursGauge: View {
         .frame(height: 20)
     }
 
-    private func position(for date: Date, width: CGFloat) -> CGFloat {
-        let startOfDay = Calendar.current.startOfDay(for: date)
-        let seconds = date.timeIntervalSince(startOfDay)
-        let normalized = min(max(seconds / dayDuration, 0), 1)
+    private func position(for date: Date, start: Date, width: CGFloat) -> CGFloat {
+        let seconds = date.timeIntervalSince(start)
+        let normalized = seconds / dayDuration
         return normalized * width
     }
 }

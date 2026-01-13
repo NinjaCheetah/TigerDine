@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 @Observable
 class DiningModel {
@@ -74,6 +75,9 @@ class DiningModel {
         // And then schedule push notifications.
         await scheduleAllPushes()
         
+        // Then refresh widget timelines with the new data.
+        WidgetCenter.shared.reloadAllTimelines()
+        
         // And finally schedule a background refresh 6 hours from now.
         scheduleNextRefresh()
     }
@@ -88,7 +92,6 @@ class DiningModel {
                 await getDaysRepresented()
                 let decoder = JSONDecoder()
                 let cachedLocationsByDay = try decoder.decode([[DiningLocation]].self, from: (UserDefaults(suiteName: "group.dev.ninjacheetah.RIT-Dining")!.data(forKey: "cachedLocationsByDay")!))
-                print(cachedLocationsByDay)
                 
                 // Load cache, update open status, do a notification cleanup, and return. We only need to clean up because loading
                 // cache means that there can't be any new notifications to schedule since the last real data refresh.
