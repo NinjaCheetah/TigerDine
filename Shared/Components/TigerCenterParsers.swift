@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Gets the current open status of a location based on the open time and close time.
 func parseOpenStatus(openTime: Date, closeTime: Date) -> OpenStatus {
     // This can probably be done a little cleaner but it's okay for now. If the location is open but the close date is within the next
     // 30 minutes, label it as closing soon, and do the opposite if it's closed but the open date is within the next 30 minutes.
@@ -31,6 +32,25 @@ func parseOpenStatus(openTime: Date, closeTime: Date) -> OpenStatus {
     return openStatus
 }
 
+/// Gets the current open status of a location with multiple opening periods based on all of its open and close times.
+func parseMultiOpenStatus(diningTimes: [DiningTimes]?) -> OpenStatus {
+    var openStatus: OpenStatus = .closed
+    if let diningTimes = diningTimes, !diningTimes.isEmpty {
+        for i in diningTimes.indices {
+            openStatus = parseOpenStatus(openTime: diningTimes[i].openTime, closeTime: diningTimes[i].closeTime)
+            // If the first event pass came back closed, loop again in case a later event has a different status. This is mostly to
+            // accurately catch Gracie's/Brick City Cafe's multiple open periods each day.
+            if openStatus != .closed {
+                break
+            }
+        }
+        return openStatus
+    } else {
+        return .closed
+    }
+}
+
+/// Parses the JSON responses from the TigerCenter API into the format used throughout TigerDine.
 func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> DiningLocation {
     print("beginning parse for \(location.name)")
     
@@ -277,20 +297,8 @@ extension DiningLocation {
     // Updates the open status of a location and of its visiting chefs, so that the labels in the UI update automatically as
     // time progresses and locations open/close/etc.
     mutating func updateOpenStatus() {
-        var openStatus: OpenStatus = .closed
-        if let diningTimes = diningTimes, !diningTimes.isEmpty {
-            for i in diningTimes.indices {
-                openStatus = parseOpenStatus(openTime: diningTimes[i].openTime, closeTime: diningTimes[i].closeTime)
-                // If the first event pass came back closed, loop again in case a later event has a different status. This is mostly to
-                // accurately catch Gracie's multiple open periods each day.
-                if openStatus != .closed {
-                    break
-                }
-            }
-            self.open = openStatus
-        } else {
-            self.open = .closed
-        }
+        // Gets the open status with the multi opening period compatible function.
+        self.open = parseMultiOpenStatus(diningTimes: diningTimes)
         if let visitingChefs = visitingChefs, !visitingChefs.isEmpty {
             let now = Date()
             for i in visitingChefs.indices {

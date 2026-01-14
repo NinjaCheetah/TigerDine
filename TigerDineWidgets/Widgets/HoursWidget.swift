@@ -18,8 +18,9 @@ struct Provider: AppIntentTimelineProvider {
         return OpenEntry(
             date: Date(),
             name: "Select a Location",
-            openTime: startOfToday,
-            closeTime: startOfTomorrow
+            diningTimes: [
+                DiningTimes(openTime: startOfToday, closeTime: startOfTomorrow)
+            ]
         )
     }
     
@@ -44,16 +45,15 @@ struct Provider: AppIntentTimelineProvider {
 
         let updateDates = buildUpdateSchedule(
             now: Date(),
-            open: baseEntry.openTime,
-            close: baseEntry.closeTime
+            open: baseEntry.diningTimes?.first!.openTime,
+            close: baseEntry.diningTimes?.first!.closeTime
         )
 
         let entries = updateDates.map {
             OpenEntry(
                 date: $0,
                 name: baseEntry.name,
-                openTime: baseEntry.openTime,
-                closeTime: baseEntry.closeTime
+                diningTimes: baseEntry.diningTimes
             )
         }
 
@@ -79,8 +79,7 @@ struct Provider: AppIntentTimelineProvider {
         return OpenEntry(
             date: Date(),
             name: location.name,
-            openTime: location.diningTimes?.first?.openTime,
-            closeTime: location.diningTimes?.first?.closeTime
+            diningTimes: location.diningTimes
         )
     }
     
@@ -117,8 +116,7 @@ struct Provider: AppIntentTimelineProvider {
 struct OpenEntry: TimelineEntry {
     let date: Date
     let name: String
-    let openTime: Date?
-    let closeTime: Date?
+    let diningTimes: [DiningTimes]?
 }
 
 struct OpenWidgetEntryView : View {
@@ -133,32 +131,28 @@ struct OpenWidgetEntryView : View {
                 .fontWeight(.bold)
             
             // Should maybe try to unify this with the almost-identical UI code in DetailView.
-            if let openTime = entry.openTime, let closeTime = entry.closeTime {
-                if entry.date >= openTime && entry.date <= closeTime {
-                    if closeTime == calendar.date(byAdding: .day, value: 1, to: openTime)! {
-                        Text("Open")
-                            .font(.title3)
-                            .foregroundStyle(.green)
-                    } else if closeTime < calendar.date(byAdding: .minute, value: 30, to: entry.date)! {
-                        Text("Closing Soon")
-                            .font(.title3)
-                            .foregroundStyle(.orange)
-                    } else {
-                        Text("Open")
-                            .font(.title3)
-                            .foregroundStyle(.green)
-                    }
-                } else if openTime <= calendar.date(byAdding: .minute, value: 30, to: entry.date)! && closeTime > entry.date {
-                    Text("Opening Soon")
+            if let diningTimes = entry.diningTimes {
+                let openStatus = parseMultiOpenStatus(diningTimes: diningTimes)
+                switch openStatus {
+                case .open:
+                    Text("Open")
                         .font(.title3)
-                        .foregroundStyle(.orange)
-                } else {
+                        .foregroundStyle(.green)
+                case .closed:
                     Text("Closed")
                         .font(.title3)
                         .foregroundStyle(.red)
+                case .openingSoon:
+                    Text("Opening Soon")
+                        .font(.title3)
+                        .foregroundStyle(.orange)
+                case .closingSoon:
+                    Text("Closing Soon")
+                        .font(.title3)
+                        .foregroundStyle(.orange)
                 }
                 
-                Text("\(dateDisplay.string(from: openTime)) - \(dateDisplay.string(from: closeTime))")
+                Text("\(dateDisplay.string(from: diningTimes[0].openTime)) - \(dateDisplay.string(from: diningTimes[0].closeTime))")
                     .foregroundStyle(.secondary)
             } else {
                 Text("Closed")
@@ -172,8 +166,7 @@ struct OpenWidgetEntryView : View {
             Spacer()
 
             OpeningHoursGauge(
-                openTime: entry.openTime,
-                closeTime: entry.closeTime,
+                diningTimes: entry.diningTimes,
                 now: entry.date
             )
         }
@@ -201,6 +194,24 @@ struct HoursWidget: Widget {
 #Preview(as: .systemSmall) {
     HoursWidget()
 } timeline: {
-    OpenEntry(date: .now, name: "Beanz", openTime: Date(timeIntervalSince1970: 1767963600), closeTime: Date(timeIntervalSince1970: 1767988800))
-    OpenEntry(date: Date(timeIntervalSince1970: 1767978000), name: "Beanz", openTime: Date(timeIntervalSince1970: 1767963600), closeTime: Date(timeIntervalSince1970: 1767988800))
+    OpenEntry(
+        date: .now,
+        name: "Beanz",
+        diningTimes: [
+            DiningTimes(
+                openTime: Date(timeIntervalSince1970: 1767963600),
+                closeTime: Date(timeIntervalSince1970: 1767988800)
+            )
+        ]
+    )
+    OpenEntry(
+        date: Date(timeIntervalSince1970: 1767978000),
+        name: "Beanz",
+        diningTimes: [
+            DiningTimes(
+                openTime: Date(timeIntervalSince1970: 1767963600),
+                closeTime: Date(timeIntervalSince1970: 1767988800)
+            )
+        ]
+    )
 }

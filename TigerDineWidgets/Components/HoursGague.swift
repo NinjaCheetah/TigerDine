@@ -8,28 +8,21 @@
 import SwiftUI
 
 struct OpeningHoursGauge: View {
-    let openTime: Date?
-    let closeTime: Date?
+    let diningTimes: [DiningTimes]?
     let now: Date
 
     private let dayDuration: TimeInterval = 86_400
     
     private var barFillColor: Color {
-        let calendar = Calendar.current
-        
-        if let openTime = openTime, let closeTime = closeTime {
-            if now >= openTime && now <= closeTime {
-                if closeTime == calendar.date(byAdding: .day, value: 1, to: openTime)! {
-                    return Color.green
-                } else if closeTime < calendar.date(byAdding: .minute, value: 30, to: now)! {
-                    return Color.orange
-                } else {
-                    return Color.green
-                }
-            } else if openTime <= calendar.date(byAdding: .minute, value: 30, to: now)! && closeTime > now {
-                return Color.orange
-            } else {
+        if let diningTimes = diningTimes {
+            let openStatus = parseMultiOpenStatus(diningTimes: diningTimes)
+            switch openStatus {
+            case .open:
+                return Color.green
+            case .closed:
                 return Color.red
+            case .openingSoon, .closingSoon:
+                return Color.orange
             }
         } else {
             return Color.red
@@ -53,24 +46,27 @@ struct OpeningHoursGauge: View {
 
                 // We can skip drawing this entire capsule if the location is never open, since there would be no opening period
                 // to draw.
-                if let openTime = openTime, let closeTime = closeTime {
-                    let openX = position(for: openTime, start: startOfToday, width: width)
-                    let closeX = position(
-                        for: closeTime,
-                        start: closeTime < openTime ? startOfTomorrow : startOfToday,
-                        width: width
-                    )
-                    
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [barFillColor.opacity(0.7), barFillColor],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
+                if let diningTimes = diningTimes {
+                    // Need to iterate here to account for locations that have multiple opening periods (Gracie's/Brick City Cafe).
+                    ForEach(diningTimes, id: \.self) { diningTime in
+                        let openX = position(for: diningTime.openTime, start: startOfToday, width: width)
+                        let closeX = position(
+                            for: diningTime.closeTime,
+                            start: diningTime.closeTime < diningTime.openTime ? startOfTomorrow : startOfToday,
+                            width: width
                         )
-                        .frame(width: max(0, closeX - openX), height: barHeight)
-                        .offset(x: openX)
+                        
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    colors: [barFillColor.opacity(0.7), barFillColor],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: max(0, closeX - openX), height: barHeight)
+                            .offset(x: openX)
+                    }
                 }
 
                 Circle()

@@ -1,5 +1,5 @@
 //
-//  SharedComponents.swift
+//  SharedUtils.swift
 //  TigerDine
 //
 //  Created by Campbell on 9/8/25.

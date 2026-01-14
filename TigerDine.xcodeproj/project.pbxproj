@@ -55,7 +55,10 @@
 		374CDA742F10B24F00D8C50A /* Exceptions for "Shared" folder in "TigerDineWidgets" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				SharedComponents.swift,
+				Components/SharedUtils.swift,
+				Components/TigerCenterParsers.swift,
+				Data/Static/FDMPMealPeriods.swift,
+				Data/Static/TCtoFDMPMap.swift,
 				Types/TigerCenterTypes.swift,
 			);
 			target = 374CDA572F10A19500D8C50A /* TigerDineWidgets */;
@@ -289,7 +292,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDineWidgets/TigerDineWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TigerDineWidgets/Info.plist;
@@ -322,7 +325,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDineWidgets/TigerDineWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TigerDineWidgets/Info.plist;
@@ -478,7 +481,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDine/TigerDine.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -515,7 +518,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDine/TigerDine.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
