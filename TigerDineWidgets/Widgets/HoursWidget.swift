@@ -89,9 +89,7 @@ struct Provider: AppIntentTimelineProvider {
         close: Date?
     ) -> [Date] {
 
-        var dates: Set<Date> = []
-
-        dates.insert(now)
+        var dates: Set<Date> = [now]
 
         if let open = open, let close = close {
             dates.insert(open)
@@ -127,39 +125,35 @@ struct OpenWidgetEntryView : View {
     var body: some View {
         VStack(alignment: .leading) {
             Text(entry.name)
-                .font(.title2)
+                .font(.title3)
                 .fontWeight(.bold)
             
-            // Should maybe try to unify this with the almost-identical UI code in DetailView.
             if let diningTimes = entry.diningTimes {
-                let openStatus = parseMultiOpenStatus(diningTimes: diningTimes)
+                let openStatus = parseMultiOpenStatus(diningTimes: diningTimes, referenceTime: entry.date)
                 switch openStatus {
                 case .open:
                     Text("Open")
-                        .font(.title3)
                         .foregroundStyle(.green)
                 case .closed:
                     Text("Closed")
-                        .font(.title3)
                         .foregroundStyle(.red)
                 case .openingSoon:
                     Text("Opening Soon")
-                        .font(.title3)
                         .foregroundStyle(.orange)
                 case .closingSoon:
                     Text("Closing Soon")
-                        .font(.title3)
                         .foregroundStyle(.orange)
                 }
                 
                 Text("\(dateDisplay.string(from: diningTimes[0].openTime)) - \(dateDisplay.string(from: diningTimes[0].closeTime))")
+                    .font(.system(size: 15))
                     .foregroundStyle(.secondary)
             } else {
                 Text("Closed")
-                    .font(.title3)
                     .foregroundStyle(.red)
                 
                 Text("Not Open Today")
+                    .font(.system(size: 15))
                     .foregroundStyle(.secondary)
             }
                         
@@ -167,7 +161,7 @@ struct OpenWidgetEntryView : View {
 
             OpeningHoursGauge(
                 diningTimes: entry.diningTimes,
-                now: entry.date
+                referenceTime: entry.date
             )
         }
     }

@@ -9,13 +9,13 @@ import SwiftUI
 
 struct OpeningHoursGauge: View {
     let diningTimes: [DiningTimes]?
-    let now: Date
+    let referenceTime: Date
 
     private let dayDuration: TimeInterval = 86_400
     
     private var barFillColor: Color {
         if let diningTimes = diningTimes {
-            let openStatus = parseMultiOpenStatus(diningTimes: diningTimes)
+            let openStatus = parseMultiOpenStatus(diningTimes: diningTimes, referenceTime: referenceTime)
             switch openStatus {
             case .open:
                 return Color.green
@@ -34,10 +34,10 @@ struct OpeningHoursGauge: View {
             let width = geometry.size.width
             let barHeight: CGFloat = 16
             
-            let startOfToday = Calendar.current.startOfDay(for: now)
+            let startOfToday = Calendar.current.startOfDay(for: referenceTime)
             let startOfTomorrow = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
 
-            let nowX = position(for: now, start: startOfToday, width: width)
+            let nowX = position(for: referenceTime, start: startOfToday, width: width)
 
             ZStack(alignment: .leading) {
                 Capsule()

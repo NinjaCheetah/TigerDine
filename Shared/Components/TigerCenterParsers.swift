@@ -8,46 +8,48 @@
 import Foundation
 
 /// Gets the current open status of a location based on the open time and close time.
-func parseOpenStatus(openTime: Date, closeTime: Date) -> OpenStatus {
-    // This can probably be done a little cleaner but it's okay for now. If the location is open but the close date is within the next
-    // 30 minutes, label it as closing soon, and do the opposite if it's closed but the open date is within the next 30 minutes.
+func parseOpenStatus(openTime: Date, closeTime: Date, referenceTime: Date) -> OpenStatus {
+    // If the location is open but the close time is within the next 30 minutes, label it as closing soon, and do the opposite
+    // if it's closed but the open time is within the next 30 minutes.
     let calendar = Calendar.current
-    let now = Date()
-    var openStatus: OpenStatus = .closed
-    if now >= openTime && now <= closeTime {
+    if referenceTime >= openTime && referenceTime <= closeTime {
         // This is basically just for Bytes, it checks the case where the open and close times are exactly 24 hours apart, which is
         // only true for 24-hour locations.
         if closeTime == calendar.date(byAdding: .day, value: 1, to: openTime)! {
-            openStatus = .open
-        } else if closeTime < calendar.date(byAdding: .minute, value: 30, to: now)! {
-            openStatus = .closingSoon
-        } else {
-            openStatus = .open
+            return .open
+        } else if closeTime < calendar.date(byAdding: .minute, value: 30, to: referenceTime)! {
+            return .closingSoon
         }
-    } else if openTime <= calendar.date(byAdding: .minute, value: 30, to: now)! && closeTime > now {
-        openStatus = .openingSoon
-    } else {
-        openStatus = .closed
-    }
-    return openStatus
-}
-
-/// Gets the current open status of a location with multiple opening periods based on all of its open and close times.
-func parseMultiOpenStatus(diningTimes: [DiningTimes]?) -> OpenStatus {
-    var openStatus: OpenStatus = .closed
-    if let diningTimes = diningTimes, !diningTimes.isEmpty {
-        for i in diningTimes.indices {
-            openStatus = parseOpenStatus(openTime: diningTimes[i].openTime, closeTime: diningTimes[i].closeTime)
-            // If the first event pass came back closed, loop again in case a later event has a different status. This is mostly to
-            // accurately catch Gracie's/Brick City Cafe's multiple open periods each day.
-            if openStatus != .closed {
-                break
-            }
-        }
-        return openStatus
+        return .open
+    } else if referenceTime < openTime && openTime <= calendar.date(byAdding: .minute, value: 30, to: referenceTime)! {
+        return .openingSoon
     } else {
         return .closed
     }
+}
+
+/// Gets the current open status of a location with multiple opening periods based on all of its open and close times.
+func parseMultiOpenStatus(diningTimes: [DiningTimes]?, referenceTime: Date) -> OpenStatus {
+    var openStatus: OpenStatus = .closed
+    
+    guard let diningTimes, !diningTimes.isEmpty else {
+        return .closed
+    }
+    
+    for i in diningTimes.indices {
+        openStatus = parseOpenStatus(
+            openTime: diningTimes[i].openTime,
+            closeTime: diningTimes[i].closeTime,
+            referenceTime: referenceTime
+        )
+        // If the first event pass came back closed, loop again in case a later event has a different status. This is mostly to
+        // accurately catch Gracie's/Brick City Cafe's multiple open periods each day.
+        if openStatus != .closed {
+            return openStatus
+        }
+    }
+    
+    return .closed
 }
 
 /// Parses the JSON responses from the TigerCenter API into the format used throughout TigerDine.
@@ -181,7 +183,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
     // 30 minutes, label it as closing soon, and do the opposite if it's closed but the open date is within the next 30 minutes.
     var openStatus: OpenStatus = .closed
     for i in diningTimes.indices {
-        openStatus = parseOpenStatus(openTime: diningTimes[i].openTime, closeTime: diningTimes[i].closeTime)
+        openStatus = parseOpenStatus(openTime: diningTimes[i].openTime, closeTime: diningTimes[i].closeTime, referenceTime: now)
         // If the first event pass came back closed, loop again in case a later event has a different status. This is mostly to
         // accurately catch Gracie's multiple open periods each day.
         if openStatus != .closed {
@@ -242,7 +244,7 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                 }
                 
                 // Parse the chef's status, mapping the OpenStatus to a VisitingChefStatus.
-                let visitngChefStatus: VisitingChefStatus = switch parseOpenStatus(openTime: openTime, closeTime: closeTime) {
+                let visitngChefStatus: VisitingChefStatus = switch parseOpenStatus(openTime: openTime, closeTime: closeTime, referenceTime: now) {
                 case .open:
                         .hereNow
                 case .closed:
@@ -297,14 +299,15 @@ extension DiningLocation {
     // Updates the open status of a location and of its visiting chefs, so that the labels in the UI update automatically as
     // time progresses and locations open/close/etc.
     mutating func updateOpenStatus() {
+        let now = Date()
         // Gets the open status with the multi opening period compatible function.
-        self.open = parseMultiOpenStatus(diningTimes: diningTimes)
+        self.open = parseMultiOpenStatus(diningTimes: diningTimes, referenceTime: now)
         if let visitingChefs = visitingChefs, !visitingChefs.isEmpty {
-            let now = Date()
             for i in visitingChefs.indices {
                 self.visitingChefs![i].status = switch parseOpenStatus(
                     openTime: visitingChefs[i].openTime,
-                    closeTime: visitingChefs[i].closeTime) {
+                    closeTime: visitingChefs[i].closeTime,
+                    referenceTime: now) {
                 case .open:
                         .hereNow
                 case .closed:
