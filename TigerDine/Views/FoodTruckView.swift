@@ -12,14 +12,7 @@ struct FoodTruckView: View {
     @State private var foodTruckEvents: [FoodTruckEvent] = []
     @State private var isLoading: Bool = true
     @State private var loadFailed: Bool = false
-    @State private var rotationDegrees: Double = 0
     @State private var showingSafari: Bool = false
-    
-    private var animation: Animation {
-        .linear
-        .speed(0.1)
-        .repeatForever(autoreverses: false)
-    }
     
     private func doFoodTruckStuff() async {
         switch await getFoodTruckPage() {
@@ -35,34 +28,11 @@ struct FoodTruckView: View {
     var body: some View {
         if isLoading {
             VStack {
-                if loadFailed {
-                    Image(systemName: "wifi.exclamationmark.circle")
-                        .resizable()
-                        .frame(width: 75, height: 75)
-                        .foregroundStyle(.accent)
-                    Text("An error occurred while fetching food truck data. Please check your network connection and try again.")
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                } else {
-                    Image(systemName: "truck.box")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 75, height: 75)
-                        .foregroundStyle(.accent)
-                        .rotationEffect(.degrees(rotationDegrees))
-                        .onAppear {
-                            withAnimation(animation) {
-                                rotationDegrees = 360.0
-                            }
-                        }
-                    Text("One moment...")
-                        .foregroundStyle(.secondary)
-                }
+                LoadingView(loadFailed: $loadFailed, loadingType: .truck)
             }
             .task {
                 await doFoodTruckStuff()
             }
-            .padding()
         } else {
             ScrollView {
                 VStack(alignment: .leading) {

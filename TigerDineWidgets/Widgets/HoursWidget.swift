@@ -20,7 +20,8 @@ struct Provider: AppIntentTimelineProvider {
             name: "Select a Location",
             diningTimes: [
                 DiningTimes(openTime: startOfToday, closeTime: startOfTomorrow)
-            ]
+            ],
+            url: URL(string: "tigerdine://")!
         )
     }
     
@@ -53,7 +54,8 @@ struct Provider: AppIntentTimelineProvider {
             OpenEntry(
                 date: $0,
                 name: baseEntry.name,
-                diningTimes: baseEntry.diningTimes
+                diningTimes: baseEntry.diningTimes,
+                url: baseEntry.url
             )
         }
 
@@ -79,7 +81,8 @@ struct Provider: AppIntentTimelineProvider {
         return OpenEntry(
             date: Date(),
             name: location.name,
-            diningTimes: location.diningTimes
+            diningTimes: location.diningTimes,
+            url: URL(string: "tigerdine:///location?id=\(location.id)")!
         )
     }
     
@@ -115,6 +118,7 @@ struct OpenEntry: TimelineEntry {
     let date: Date
     let name: String
     let diningTimes: [DiningTimes]?
+    let url: URL
 }
 
 struct OpenWidgetEntryView : View {
@@ -178,6 +182,7 @@ struct HoursWidget: Widget {
         ) { entry in
             OpenWidgetEntryView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetURL(entry.url)
         }
         .configurationDisplayName("Location Hours")
         .description("See today's hours for a chosen location.")
@@ -196,7 +201,8 @@ struct HoursWidget: Widget {
                 openTime: Date(timeIntervalSince1970: 1767963600),
                 closeTime: Date(timeIntervalSince1970: 1767988800)
             )
-        ]
+        ],
+        url: URL(string: "tigerdine:///location?id=31")!
     )
     OpenEntry(
         date: Date(timeIntervalSince1970: 1767978000),
@@ -206,6 +212,7 @@ struct HoursWidget: Widget {
                 openTime: Date(timeIntervalSince1970: 1767963600),
                 closeTime: Date(timeIntervalSince1970: 1767988800)
             )
-        ]
+        ],
+        url: URL(string: "tigerdine:///location?id=31")!
     )
 }

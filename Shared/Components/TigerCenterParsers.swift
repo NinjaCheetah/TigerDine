@@ -54,7 +54,7 @@ func parseMultiOpenStatus(diningTimes: [DiningTimes]?, referenceTime: Date) -> O
 
 /// Parses the JSON responses from the TigerCenter API into the format used throughout TigerDine.
 func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> DiningLocation {
-    print("beginning parse for \(location.name)")
+    print("beginning parse for \(location.name) (id: \(location.id))")
     
     // The descriptions sometimes have HTML <br /> tags despite also having \n. Those need to be removed.
     let desc = location.description.replacingOccurrences(of: "<br />", with: "")

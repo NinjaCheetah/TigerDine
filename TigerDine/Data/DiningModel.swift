@@ -29,6 +29,8 @@ class DiningModel {
     var favorites = Favorites()
     var notifyingChefs = NotifyingChefs()
     var visitingChefPushes = VisitingChefPushesModel()
+    // Loading state to access in the UI.
+    var isLoaded = false
     
     func getDaysRepresented() async {
         let calendar = Calendar.current
@@ -41,6 +43,7 @@ class DiningModel {
     
     /// This is the actual method responsible for making requests to the API for the current day and next 6 days to collect all of the information that the app needs for the various view. Making it part of the model allows it to be updated from any view at any time, and prevents excess API requests (if you never refresh, the app will never need to make more than 7 calls per launch).
     func getHoursByDay() async throws {
+        print("loading from network")
         await getDaysRepresented()
         var newLocationsByDay = [[DiningLocation]]()
         for day in daysRepresented {
@@ -78,8 +81,11 @@ class DiningModel {
         // Then refresh widget timelines with the new data.
         WidgetCenter.shared.reloadAllTimelines()
         
-        // And finally schedule a background refresh 6 hours from now.
+        // Then schedule a background refresh 6 hours from now.
         scheduleNextRefresh()
+        
+        // And finally set the loaded state to true.
+        isLoaded = true
     }
     
     /// Wrapper function for the real getHoursByDay() that checks the last refreshed stamp and uses cached data if it's fresh or triggers a refresh if it's stale.
@@ -88,6 +94,7 @@ class DiningModel {
         // If we can't access the lastRefreshed key, then there is likely no cache.
         if let lastRefreshed = lastRefreshed {
             if Calendar.current.startOfDay(for: now) == Calendar.current.startOfDay(for: lastRefreshed) {
+                print("cache hit, loading from cache")
                 // Last refresh happened today, so the cache is fresh and we should load that.
                 await getDaysRepresented()
                 let decoder = JSONDecoder()
@@ -98,8 +105,11 @@ class DiningModel {
                 locationsByDay = cachedLocationsByDay
                 updateOpenStatuses()
                 await cleanupPushes()
+                
+                isLoaded = true
                 return
             }
+            print("cache miss")
             // Otherwise, the cache is stale and we can fall out to the call to update it.
         }
         try await getHoursByDay()

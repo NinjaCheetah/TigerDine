@@ -14,17 +14,10 @@ struct MenuView: View {
     @State private var searchText: String = ""
     @State private var isLoading: Bool = true
     @State private var loadFailed: Bool = false
-    @State private var rotationDegrees: Double = 0
     @State private var selectedMealPeriod: Int = 0
     @State private var openPeriods: [Int] = []
     @StateObject private var dietaryRestrictionsModel = MenuDietaryRestrictionsModel()
     @State private var showingDietaryRestrictionsSheet: Bool = false
-    
-    private var animation: Animation {
-        .linear
-        .speed(0.1)
-        .repeatForever(autoreverses: false)
-    }
     
     func getOpenPeriods() async {
         // Only run this if we haven't already gotten the open periods. This is somewhat of a bandaid solution to the issue of
@@ -114,33 +107,11 @@ struct MenuView: View {
     var body: some View {
         if isLoading {
             VStack {
-                if loadFailed {
-                    Image(systemName: "wifi.exclamationmark.circle")
-                        .resizable()
-                        .frame(width: 75, height: 75)
-                        .foregroundStyle(.accent)
-                    Text("An error occurred while fetching the menu. Please check your network connection and try again.")
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                } else {
-                    Image(systemName: "fork.knife.circle")
-                        .resizable()
-                        .frame(width: 75, height: 75)
-                        .foregroundStyle(.accent)
-                        .rotationEffect(.degrees(rotationDegrees))
-                        .onAppear {
-                            withAnimation(animation) {
-                                rotationDegrees = 360.0
-                            }
-                        }
-                    Text("One moment...")
-                        .foregroundStyle(.secondary)
-                }
+                LoadingView(loadFailed: $loadFailed)
             }
             .task {
                 await getOpenPeriods()
             }
-            .padding()
         } else {
             VStack {
                 if !menuItems.isEmpty {
@@ -219,7 +190,6 @@ struct MenuView: View {
                 }
             }
             .onChange(of: selectedMealPeriod) {
-                rotationDegrees = 0
                 isLoading = true
                 Task {
                     await getMenuForPeriod(mealPeriodId: selectedMealPeriod)

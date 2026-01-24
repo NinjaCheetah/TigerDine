@@ -57,7 +57,7 @@ struct LocationList: View {
     
     var body: some View {
         ForEach(filteredLocations, id: \.self) { location in
-            NavigationLink(destination: DetailView(locationId: location.id)) {
+            NavigationLink(value: location) {
                 VStack(alignment: .leading) {
                     HStack {
                         Text(location.name)

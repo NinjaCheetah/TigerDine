@@ -14,17 +14,13 @@ struct ContentView: View {
 
     @Environment(DiningModel.self) var model
     
-    @State private var isLoading: Bool = true
+    @Binding var targetLocationId: Int?
+    @Binding var handledLocationId: Int?
+    
     @State private var loadFailed: Bool = false
     @State private var showingDonationSheet: Bool = false
-    @State private var rotationDegrees: Double = 0
     @State private var searchText: String = ""
-    
-    private var animation: Animation {
-        .linear
-        .speed(0.1)
-        .repeatForever(autoreverses: false)
-    }
+    @State private var path = NavigationPath()
     
     // Small wrapper around the method on the model so that errors can be handled by showing the uh error screen.
     private func getDiningData(bustCache: Bool = false) async {
@@ -35,9 +31,7 @@ struct ContentView: View {
             else {
                 try await model.getHoursByDayCached()
             }
-            isLoading = false
         } catch {
-            isLoading = true
             loadFailed = true
         }
     }
@@ -58,43 +52,33 @@ struct ContentView: View {
         }
     }
     
+    private func handleOpenDeepLink() {
+        guard
+            model.isLoaded,
+            let targetLocationId,
+            handledLocationId != targetLocationId,
+            !model.locationsByDay.isEmpty,
+            let location = model.locationsByDay[0].first(where: { $0.id == targetLocationId })
+            else { return }
+        handledLocationId = targetLocationId
+        print("TigerDine opened to \(location.name)")
+        // Reset the path back to the root (which is here, ContentView).
+        path = NavigationPath()
+        // Do this in an async block because apparently SwiftUI won't handle these two NavigationPath changes
+        // consecutively. Putting the second change in an async block makes it actually update the path the
+        // second time.
+        DispatchQueue.main.async {
+            path.append(location)
+            self.targetLocationId = nil
+        }
+    }
+    
     var body: some View {
-        NavigationStack() {
-            if isLoading {
+        NavigationStack(path: $path) {
+            if !model.isLoaded {
                 VStack {
-                    if loadFailed {
-                        Image(systemName: "wifi.exclamationmark.circle")
-                            .resizable()
-                            .frame(width: 75, height: 75)
-                            .foregroundStyle(.accent)
-                        Text("An error occurred while fetching dining data. Please check your network connection and try again.")
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                        Button(action: {
-                            loadFailed = false
-                            Task {
-                                await getDiningData(bustCache: true)
-                            }
-                        }) {
-                            Label("Refresh", systemImage: "arrow.clockwise")
-                        }
-                        .padding(.top, 10)
-                    } else {
-                        Image(systemName: "fork.knife.circle")
-                            .resizable()
-                            .frame(width: 75, height: 75)
-                            .foregroundStyle(.accent)
-                            .rotationEffect(.degrees(rotationDegrees))
-                            .onAppear {
-                                withAnimation(animation) {
-                                    rotationDegrees = 360.0
-                                }
-                            }
-                        Text("Loading...")
-                            .foregroundStyle(.secondary)
-                    }
+                    LoadingView(loadFailed: $loadFailed)
                 }
-                .padding()
             } else {
                 VStack() {
                     List {
@@ -125,6 +109,15 @@ struct ContentView: View {
                             }
                         })
                     }
+                    .navigationDestination(for: DiningLocation.self) { location in
+                        DetailView(locationId: location.id)
+                    }
+                    .onChange(of: targetLocationId) {
+                        handleOpenDeepLink()
+                    }
+                    .onChange(of: model.isLoaded) {
+                        handleOpenDeepLink()
+                    }
                 }
                 .navigationTitle("TigerDine")
                 .searchable(text: $searchText, prompt: "Search")
@@ -144,7 +137,13 @@ struct ContentView: View {
                             }) {
                                 Label("Refresh", systemImage: "arrow.clockwise")
                             }
-                            
+                            #if DEBUG
+                            Button(action: {
+                                model.lastRefreshed = Date(timeIntervalSince1970: 0.0)
+                            }) {
+                                Label("Invalidate Cache", systemImage: "ant")
+                            }
+                            #endif
                             Divider()
                             NavigationLink(destination: AboutView()) {
                                 Image(systemName: "info.circle")
@@ -192,5 +191,8 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    @Previewable @State var targetLocationId: Int?
+    @Previewable @State var handledLocationId: Int?
+    
+    ContentView(targetLocationId: $targetLocationId, handledLocationId: $handledLocationId)
 }

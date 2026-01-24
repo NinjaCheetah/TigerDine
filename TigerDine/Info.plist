@@ -6,6 +6,19 @@
 	<array>
 		<string>dev.ninjacheetah.RIT-Dining.refresh</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>dev.ninjacheetah.RIT-Dining</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tigerdine</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
