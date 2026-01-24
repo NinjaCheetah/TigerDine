@@ -16,10 +16,12 @@ TigerDine is an unofficial app for getting information about dining locations fo
 - Check out what visiting chefs are on campus each day and where you can find them.
 - View the menu at each location, with support for allergies and other dietary restrictions.
 - See the nutrition facts for menu items.
+- Get visiting chef notifications, so you can be notified day-of when and where your favorite visiting chef will be on campus.
+- Home screen widgets so that the hours for your favorite dining locations can be easily accessible on your home screen (or even your Mac if the app is on your phone!).
 
 ### Proposed Features:
-- Visiting chef notifications, so you can be notified day-of when and where your favorite visiting chef will be on campus.
 - Nutrition tracking, to keep track of what food you've eaten in a day (along with other potential extended meal planning features).
+- Visiting chef widgets, so you can see the next time that your favorite visiting chef will be on campus at a glance.
 
 ## Information Sources
 - Dining locations, their descriptions, and their opening hours are sourced from the RIT student-run TigerCenter API. [Link](https://tigercenter.rit.edu/)
