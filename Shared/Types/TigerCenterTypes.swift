@@ -17,6 +17,7 @@ struct DiningLocationParser: Decodable {
             let name: String
             let startTime: String
             let endTime: String
+            let daysOfWeek: [String]
             let startDate: String
             let endDate: String
             let open: Bool

@@ -94,10 +94,16 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
     var closeStrings: [String] = []
     
     // Dining locations have a regular schedule, but then they also have exceptions listed for days like weekends or holidays. If there
-    // are exceptions, use those times for the day, otherwise we can just use the default times. Also check for repeats! The response data
-    // can include those somtimes, for reasons:tm:
+    // are exceptions, use those times for the day, otherwise we can just use the default times. Also check for repeats! The response
+    // data can include those somtimes, for reasons:tm:
     for event in location.events {
-        if let exceptions = event.exceptions, !exceptions.isEmpty {
+        if let exceptions = event.exceptions,
+            !exceptions.isEmpty,
+           // This additional check is necessary, because sometimes the exceptions are silly and are doing something like marking
+           // a location as closed on a day that isn't included in the regular schedule anyway. That breaks things. This check
+           // ensures that the exception being looked at applies for the day we're parsing for before trying to follow it.
+            exceptions[0].daysOfWeek.contains(weekdayFromDate.string(from: forDate ?? Date()).uppercased())
+        {
             // Only save the exception times if the location is actually open during those times, and if these times aren't a repeat.
             // I've seen repeats for Brick City Cafe specifically, where both the breakfast and lunch standard open periods had
             // exceptions listing the same singluar brunch period. That feels like a stupid choice but oh well.
@@ -175,12 +181,11 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
         }
     }
     
-    // Sometimes the openings are not in order, for some reason. I'm observing this with Brick City, where for some reason the early opening
-    // is event 1, and the later opening is event 0. This is silly so let's reverse it.
+    // Sometimes the openings are not in order, for some reason. I'm observing this with Brick City, where for some reason the early
+    // opening is event 1, and the later opening is event 0. This is silly so let's reverse it.
     diningTimes.sort { $0.openTime < $1.openTime }
     
-    // This can probably be done a little cleaner but it's okay for now. If the location is open but the close date is within the next
-    // 30 minutes, label it as closing soon, and do the opposite if it's closed but the open date is within the next 30 minutes.
+    // Get the current open status for a location. Details about how this works can be seen in the docs for parseOpenStatus().
     var openStatus: OpenStatus = .closed
     for i in diningTimes.indices {
         openStatus = parseOpenStatus(openTime: diningTimes[i].openTime, closeTime: diningTimes[i].closeTime, referenceTime: now)
