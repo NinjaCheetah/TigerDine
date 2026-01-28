@@ -87,7 +87,8 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
             diningTimes: nil,
             open: .closed,
             visitingChefs: nil,
-            dailySpecials: nil)
+            dailySpecials: nil
+        )
     }
     
     var openStrings: [String] = []
@@ -160,13 +161,15 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
             bySettingHour: openTimeComponents.hour!,
             minute: openTimeComponents.minute!,
             second: openTimeComponents.second!,
-            of: now)!)
+            of: now)!
+        )
         
         closeDates.append(calendar.date(
             bySettingHour: closeTimeComponents.hour!,
             minute: closeTimeComponents.minute!,
             second: closeTimeComponents.second!,
-            of: now)!)
+            of: now)!
+        )
     }
     var diningTimes: [DiningTimes] = []
     for i in 0..<openDates.count {
@@ -269,13 +272,17 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                     description: menu.description ?? "No description available", // Some don't have descriptions, apparently.
                     openTime: openTime,
                     closeTime: closeTime,
-                    status: visitngChefStatus))
+                    status: visitngChefStatus)
+                )
             } else if menu.category == "Daily Specials" {
                 print("found daily special: \(menu.name)")
                 let splitString = menu.name.split(separator: "(", maxSplits: 1)
-                specials.append(DailySpecial(
-                    name: String(splitString[0]),
-                    type: String(splitString.count > 1 ? String(splitString[1]) : "").replacingOccurrences(of: ")", with: "")))
+                specials.append(
+                    DailySpecial(
+                        name: String(splitString[0]),
+                        type: String(splitString.count > 1 ? String(splitString[1]) : "").replacingOccurrences(of: ")", with: "")
+                    )
+                )
             }
         }
         visitingChefs = chefs
@@ -297,7 +304,8 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
         diningTimes: diningTimes,
         open: openStatus,
         visitingChefs: visitingChefs,
-        dailySpecials: dailySpecials)
+        dailySpecials: dailySpecials
+    )
 }
 
 extension DiningLocation {

@@ -17,6 +17,7 @@ struct LoadingView: View {
     @State var loadingType: LoadingType = .normal
     
     @State private var rotationDegrees: Double = 0
+    @State private var loadingText: String = ""
     
     private var animation: Animation {
         .linear
@@ -32,6 +33,13 @@ struct LoadingView: View {
             return "truck.box"
         }
     }
+    
+    var loadingTextOptions: [String] = [
+        "Loading...",
+        "One moment...",
+        "Hang tight...",
+        "Just a moment...",
+    ]
     
     var body: some View {
         VStack {
@@ -55,8 +63,11 @@ struct LoadingView: View {
                             rotationDegrees = 360.0
                         }
                     }
-                Text("Loading...")
+                Text(loadingText)
                     .foregroundStyle(.secondary)
+                    .onAppear {
+                        loadingText = loadingTextOptions.randomElement() ?? ""
+                    }
             }
         }
         .padding()

@@ -91,7 +91,7 @@ struct MenuItemView: View {
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 16)
         }
         .navigationTitle("Details")
         .navigationBarTitleDisplayMode(.inline)

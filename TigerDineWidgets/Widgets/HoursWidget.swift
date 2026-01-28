@@ -148,10 +148,11 @@ struct OpenWidgetEntryView : View {
                     Text("Closing Soon")
                         .foregroundStyle(.orange)
                 }
-                
-                Text("\(dateDisplay.string(from: diningTimes[0].openTime)) - \(dateDisplay.string(from: diningTimes[0].closeTime))")
-                    .font(.system(size: 15))
-                    .foregroundStyle(.secondary)
+                ForEach(diningTimes, id: \.self) { diningTime in
+                    Text("\(dateDisplay.string(from: diningTime.openTime)) - \(dateDisplay.string(from: diningTime.closeTime))")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.secondary)
+                }
             } else {
                 Text("Closed")
                     .foregroundStyle(.red)

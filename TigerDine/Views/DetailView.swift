@@ -137,7 +137,7 @@ struct DetailView: View {
                     .font(.title3)
                     #endif
                 }
-                .padding(.bottom, 12)
+                .padding(.bottom, 16)
                 if let visitingChefs = location.visitingChefs, !visitingChefs.isEmpty {
                     VStack(alignment: .leading) {
                         Text("Today's Visiting Chefs")
@@ -172,7 +172,7 @@ struct DetailView: View {
                             Divider()
                         }
                     }
-                    .padding(.bottom, 12)
+                    .padding(.bottom, 16)
                 }
                 if let dailySpecials = location.dailySpecials, !dailySpecials.isEmpty {
                     VStack(alignment: .leading) {
@@ -189,7 +189,7 @@ struct DetailView: View {
                             Divider()
                         }
                     }
-                    .padding(.bottom, 12)
+                    .padding(.bottom, 16)
                 }
                 VStack(alignment: .leading) {
                     Text("Upcoming Hours")
@@ -209,16 +209,12 @@ struct DetailView: View {
                         Divider()
                     }
                 }
-                .padding(.bottom, 12)
+                .padding(.bottom, 16)
                 // Ideally I'd like this text to be justified to more effectively use the screen space.
                 Text(location.desc)
                     .font(.body)
-                    .padding(.bottom, 10)
-                Text("IMPORTANT: Some locations' descriptions may refer to them as being cashless during certain hours. This is outdated information, as all RIT Dining locations are now cashless 24/7.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 16)
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
                     // Favorites toggle button.

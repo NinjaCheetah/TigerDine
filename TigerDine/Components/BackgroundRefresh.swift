@@ -20,6 +20,7 @@ func scheduleNextRefresh() {
     
     do {
         try BGTaskScheduler.shared.submit(request)
+        print("background refresh scheduled successfully")
     } catch {
         print("failed to schedule background refresh: ", error)
     }

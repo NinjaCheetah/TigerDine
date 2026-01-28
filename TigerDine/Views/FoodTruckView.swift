@@ -55,7 +55,7 @@ struct FoodTruckView: View {
                     Text("Food truck data is sourced directly from the RIT Events website, and may not be presented correctly. Use the globe button in the top right to access the RIT Events website directly to see the original source of the information.")
                         .foregroundStyle(.secondary)
                 }
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 16)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {

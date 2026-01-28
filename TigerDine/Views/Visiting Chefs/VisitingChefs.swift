@@ -123,7 +123,7 @@ struct VisitingChefs: View {
                     }
                 }
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 16)
         }
         .sheet(item: $safariUrl) { url in
             SafariView(url: url.url)
