@@ -19,6 +19,7 @@ struct ContentView: View {
     
     @State private var loadFailed: Bool = false
     @State private var showingDonationSheet: Bool = false
+    @State private var showingFeedbackSheet: Bool = false
     @State private var searchText: String = ""
     @State private var path = NavigationPath()
     
@@ -150,6 +151,11 @@ struct ContentView: View {
                                 Text("About")
                             }
                             Button(action: {
+                                showingFeedbackSheet = true
+                            }) {
+                                Label("Feedback", systemImage: "paperplane")
+                            }
+                            Button(action: {
                                 showingDonationSheet = true
                             }) {
                                 Label("Donate", systemImage: "heart")
@@ -186,6 +192,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingDonationSheet) {
             DonationView()
+        }
+        .sheet(isPresented: $showingFeedbackSheet) {
+            FeedbackView()
         }
     }
 }

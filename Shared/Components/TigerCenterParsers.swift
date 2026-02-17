@@ -42,6 +42,16 @@ func parseMultiOpenStatus(diningTimes: [DiningTimes]?, referenceTime: Date) -> O
             closeTime: diningTimes[i].closeTime,
             referenceTime: referenceTime
         )
+        
+        // If we're closing soon for the current opening period, but then we're opening again at the same time we close in the next
+        // period, we should just stick with "Open" because showing "Closing Soon" for 30 minutes and then going straight back to
+        // "Open" is kinda confusing. This issue has been observed with Petals specifically.
+        if openStatus == .closingSoon && i != diningTimes.indices.last {
+            if diningTimes[i].closeTime == diningTimes[i + 1].openTime {
+                openStatus = .open
+            }
+        }
+        
         // If the first event pass came back closed, loop again in case a later event has a different status. This is mostly to
         // accurately catch Gracie's/Brick City Cafe's multiple open periods each day.
         if openStatus != .closed {

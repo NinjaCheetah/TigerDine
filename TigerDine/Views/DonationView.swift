@@ -10,6 +10,7 @@ import SwiftUI
 struct DonationView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) private var openURL
+    
     @State private var symbolDrawn: Bool = true
     
     var body: some View {
