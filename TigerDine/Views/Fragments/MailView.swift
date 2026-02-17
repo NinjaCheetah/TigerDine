@@ -40,7 +40,7 @@ struct MailView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MFMailComposeViewController {
         let vc = MFMailComposeViewController()
         vc.mailComposeDelegate = context.coordinator
-        vc.setToRecipients(["58050615+NinjaCheetah@users.noreply.github.com"])
+        vc.setToRecipients(["campbell@ninjacheetah.dev"])
         vc.setSubject("TigerDine Feedback")
         //vc.setMessageBody("", isHTML: false)
         return vc
