@@ -94,20 +94,33 @@ class DiningModel {
         // If we can't access the lastRefreshed key, then there is likely no cache.
         if let lastRefreshed = lastRefreshed {
             if Calendar.current.startOfDay(for: now) == Calendar.current.startOfDay(for: lastRefreshed) {
-                print("cache hit, loading from cache")
                 // Last refresh happened today, so the cache is fresh and we should load that.
+                print("cache hit, trying load from cache")
                 await getDaysRepresented()
                 let decoder = JSONDecoder()
-                let cachedLocationsByDay = try decoder.decode([[DiningLocation]].self, from: (UserDefaults(suiteName: "group.dev.ninjacheetah.RIT-Dining")!.data(forKey: "cachedLocationsByDay")!))
                 
-                // Load cache, update open status, do a notification cleanup, and return. We only need to clean up because loading
-                // cache means that there can't be any new notifications to schedule since the last real data refresh.
-                locationsByDay = cachedLocationsByDay
-                updateOpenStatuses()
-                await cleanupPushes()
-                
-                isLoaded = true
-                return
+                // These checks ensure that the key can actually be loaded from UserDefaults and that the cached JSON data can
+                // actually be loaded from the cache before trying to use it, to prevent potential crashes from force unwrapping
+                // it. Currently unclear on what could make these fail if the lastRefreshed date loaded as today, but this should
+                // mitigate it by falling back on a network load if they do.
+                if let cacheUserDefaults = UserDefaults(suiteName: "group.dev.ninjacheetah.RIT-Dining") {
+                    if let cacheData = cacheUserDefaults.data(forKey: "cachedLocationsByDay") {
+                        let cachedLocationsByDay = try decoder.decode([[DiningLocation]].self, from: cacheData)
+                        
+                        // Load cache, update open status, do a notification cleanup, and return. We only need to clean up because
+                        // loading cache means that there can't be any new notifications to schedule since the last real data refresh.
+                        locationsByDay = cachedLocationsByDay
+                        updateOpenStatuses()
+                        await cleanupPushes()
+                        
+                        isLoaded = true
+                        return
+                    } else {
+                        print("cache exists, but failed to load JSON data")
+                    }
+                } else {
+                    print("cache appears to exist, but failed to load from UserDefaults")
+                }
             }
             print("cache miss")
             // Otherwise, the cache is stale and we can fall out to the call to update it.
@@ -153,7 +166,14 @@ class DiningModel {
         let now = Date()
         for push in visitingChefPushes.pushes {
             if now > push.endTime {
-                visitingChefPushes.pushes.remove(at: visitingChefPushes.pushes.firstIndex(of: push)!)
+                // Guard this with an if let to avoid force unwrapping the index. That's something that theoretically
+                // should always be safe given that this is iterating over elements so obviously that element should exist,
+                // however there was an issue where this would sometimes unwrap a nil. My theory is that there was a small
+                // chance of this task getting run twice concurrently under certain conditions, and so one would remove the
+                // notification right before the other tried, and then it would be gone and the index would be nil.
+                if let pushIndex = visitingChefPushes.pushes.firstIndex(of: push) {
+                    visitingChefPushes.pushes.remove(at: pushIndex)
+                }
             }
         }
     }
