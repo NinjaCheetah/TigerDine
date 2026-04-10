@@ -31,6 +31,8 @@ class DiningModel {
     var visitingChefPushes = VisitingChefPushesModel()
     // Loading state to access in the UI.
     var isLoaded = false
+    // Locks
+    var pushSchedulerLock = false
     
     func getDaysRepresented() async {
         let calendar = Calendar.current
@@ -141,6 +143,8 @@ class DiningModel {
     
     /// Schedules and saves push notifications for all enabled visiting chefs.
     func scheduleAllPushes() async {
+        guard !pushSchedulerLock else { return }
+        pushSchedulerLock = true
         for day in locationsByDay {
             for location in day {
                 if let visitingChefs = location.visitingChefs {
@@ -159,6 +163,7 @@ class DiningModel {
         }
         // Run a cleanup task once we're done scheduling.
         await cleanupPushes()
+        pushSchedulerLock = false
     }
     
     /// Cleans up old push notifications that have already been delivered so that we're not still tracking them forever.

@@ -45,8 +45,8 @@ struct OpeningHoursGauge: View {
                     .frame(height: barHeight)
 
                 // We can skip drawing this entire capsule if the location is never open, since there would be no opening period
-                // to draw.
-                if let diningTimes = diningTimes {
+                // to draw. We should also skip it when the day has rolled over and the data is no longer current.
+                if let diningTimes = diningTimes, Calendar.current.isDateInToday(referenceTime) {
                     // Need to iterate here to account for locations that have multiple opening periods (Gracie's/Brick City Cafe).
                     ForEach(diningTimes, id: \.self) { diningTime in
                         let openX = position(for: diningTime.openTime, start: startOfToday, width: width)

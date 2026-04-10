@@ -132,36 +132,44 @@ struct OpenWidgetEntryView : View {
                 .font(.title3)
                 .fontWeight(.bold)
             
-            if let diningTimes = entry.diningTimes {
-                let openStatus = parseMultiOpenStatus(diningTimes: diningTimes, referenceTime: entry.date)
-                switch openStatus {
-                case .open:
-                    Text("Open")
-                        .foregroundStyle(.green)
-                case .closed:
+            if Calendar.current.isDateInToday(entry.date) {
+                if let diningTimes = entry.diningTimes {
+                    let openStatus = parseMultiOpenStatus(diningTimes: diningTimes, referenceTime: entry.date)
+                    switch openStatus {
+                    case .open:
+                        Text("Open")
+                            .foregroundStyle(.green)
+                    case .closed:
+                        Text("Closed")
+                            .foregroundStyle(.red)
+                    case .openingSoon:
+                        Text("Opening Soon")
+                            .foregroundStyle(.orange)
+                    case .closingSoon:
+                        Text("Closing Soon")
+                            .foregroundStyle(.orange)
+                    }
+                    ForEach(diningTimes, id: \.self) { diningTime in
+                        Text("\(dateDisplay.string(from: diningTime.openTime)) - \(dateDisplay.string(from: diningTime.closeTime))")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
                     Text("Closed")
                         .foregroundStyle(.red)
-                case .openingSoon:
-                    Text("Opening Soon")
-                        .foregroundStyle(.orange)
-                case .closingSoon:
-                    Text("Closing Soon")
-                        .foregroundStyle(.orange)
-                }
-                ForEach(diningTimes, id: \.self) { diningTime in
-                    Text("\(dateDisplay.string(from: diningTime.openTime)) - \(dateDisplay.string(from: diningTime.closeTime))")
-                        .font(.system(size: 14))
+                    
+                    Text("Not Open Today")
+                        .font(.system(size: 15))
                         .foregroundStyle(.secondary)
                 }
             } else {
-                Text("Closed")
-                    .foregroundStyle(.red)
-                
-                Text("Not Open Today")
-                    .font(.system(size: 15))
+                // If the date isn't today, show a placeholder telling the user to open TigerDine to
+                // refresh the data and update the widget.
+                Text("Open TigerDine to Refresh")
+                    .font(.system(size: 14))
                     .foregroundStyle(.secondary)
             }
-                        
+            
             Spacer()
 
             OpeningHoursGauge(
