@@ -12,5 +12,7 @@ import SwiftUI
 struct TigerDineWidgetsBundle: WidgetBundle {
     var body: some Widget {
         HoursWidget()
+        // Not ready yet, exclude from the bundle.
+        //VisitingChefLocationWidget()
     }
 }

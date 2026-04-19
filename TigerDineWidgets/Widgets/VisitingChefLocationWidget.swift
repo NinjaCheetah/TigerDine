@@ -1,21 +1,20 @@
 //
-//  HoursWidget.swift
-//  TigerDineWidgets
+//  VisitingChefLocationWidget.swift
+//  TigerDine
 //
-//  Created by Campbell on 1/8/26.
+//  Created by Campbell on 4/14/26.
 //
 
 import WidgetKit
 import SwiftUI
 
-// This timeline provider is currently held together with duct tape. But hey, that's what beta testing is for.
-struct HoursWidgetProvider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> HoursWidgetEntry {
+struct VisitingChefLocationWidgetProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> VisitingChefLocationWidgetEntry {
         let calendar = Calendar.current
         let startOfToday = calendar.startOfDay(for: Date())
         let startOfTomorrow = calendar.date(byAdding: .day, value: 1, to: startOfToday)!
 
-        return HoursWidgetEntry(
+        return VisitingChefLocationWidgetEntry(
             date: Date(),
             name: "Select a Location",
             diningTimes: [
@@ -28,14 +27,14 @@ struct HoursWidgetProvider: AppIntentTimelineProvider {
     func snapshot(
             for configuration: LocationHoursIntent,
             in context: Context
-    ) async -> HoursWidgetEntry {
+    ) async -> VisitingChefLocationWidgetEntry {
         loadEntry(for: configuration) ?? placeholder(in: context)
     }
 
     func timeline(
         for configuration: LocationHoursIntent,
         in context: Context
-    ) async -> Timeline<HoursWidgetEntry> {
+    ) async -> Timeline<VisitingChefLocationWidgetEntry> {
 
         guard let baseEntry = loadEntry(for: configuration) else {
             return Timeline(
@@ -51,7 +50,7 @@ struct HoursWidgetProvider: AppIntentTimelineProvider {
         )
 
         let entries = updateDates.map {
-            HoursWidgetEntry(
+            VisitingChefLocationWidgetEntry(
                 date: $0,
                 name: baseEntry.name,
                 diningTimes: baseEntry.diningTimes,
@@ -62,7 +61,7 @@ struct HoursWidgetProvider: AppIntentTimelineProvider {
         return Timeline(entries: entries, policy: .atEnd)
     }
     
-    func loadEntry(for configuration: LocationHoursIntent) -> HoursWidgetEntry? {
+    func loadEntry(for configuration: LocationHoursIntent) -> VisitingChefLocationWidgetEntry? {
         guard let selectedLocation = configuration.location else {
             return nil
         }
@@ -78,7 +77,7 @@ struct HoursWidgetProvider: AppIntentTimelineProvider {
             return nil
         }
 
-        return HoursWidgetEntry(
+        return VisitingChefLocationWidgetEntry(
             date: Date(),
             name: location.name,
             diningTimes: location.diningTimes,
@@ -114,15 +113,15 @@ struct HoursWidgetProvider: AppIntentTimelineProvider {
     }
 }
 
-struct HoursWidgetEntry: TimelineEntry {
+struct VisitingChefLocationWidgetEntry: TimelineEntry {
     let date: Date
     let name: String
     let diningTimes: [DiningTimes]?
     let url: URL
 }
 
-struct HoursWidgetEntryView : View {
-    var entry: HoursWidgetProvider.Entry
+struct VisitingChefLocationWidgetEntryView : View {
+    var entry: VisitingChefLocationWidgetProvider.Entry
     
     private let calendar = Calendar.current
 
@@ -180,48 +179,21 @@ struct HoursWidgetEntryView : View {
     }
 }
 
-struct HoursWidget: Widget {
-    let kind: String = "HoursWidget"
+struct VisitingChefLocationWidget: Widget {
+    let kind: String = "VisitingChefLocationWidget"
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(
             kind: kind,
             intent: LocationHoursIntent.self,
-            provider: HoursWidgetProvider()
+            provider: VisitingChefLocationWidgetProvider()
         ) { entry in
-            HoursWidgetEntryView(entry: entry)
+            VisitingChefLocationWidgetEntryView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
                 .widgetURL(entry.url)
         }
-        .configurationDisplayName("Location Hours")
-        .description("See today's hours for a chosen location.")
+        .configurationDisplayName("Visiting Chefs by Location")
+        .description("See what visiting chefs are at a given location.")
         .supportedFamilies([.systemSmall])
     }
-}
-
-#Preview(as: .systemSmall) {
-    HoursWidget()
-} timeline: {
-    HoursWidgetEntry(
-        date: .now,
-        name: "Beanz",
-        diningTimes: [
-            DiningTimes(
-                openTime: Date(timeIntervalSince1970: 1767963600),
-                closeTime: Date(timeIntervalSince1970: 1767988800)
-            )
-        ],
-        url: URL(string: "tigerdine:///location?id=31")!
-    )
-    HoursWidgetEntry(
-        date: Date(timeIntervalSince1970: 1767978000),
-        name: "Beanz",
-        diningTimes: [
-            DiningTimes(
-                openTime: Date(timeIntervalSince1970: 1767963600),
-                closeTime: Date(timeIntervalSince1970: 1767988800)
-            )
-        ],
-        url: URL(string: "tigerdine:///location?id=31")!
-    )
 }

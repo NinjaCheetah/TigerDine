@@ -1,5 +1,5 @@
 //
-//  HoursWidgetSelection.swift
+//  WidgetLocationSelection.swift
 //  TigerDine
 //
 //  Created by Campbell on 1/9/26.

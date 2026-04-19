@@ -233,10 +233,10 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                 let closeTime: Date
                 if let openString = timeStrings.first?.trimmingCharacters(in: .whitespaces) {
                     // If the time is NOT in the morning, add 12 hours.
-                    let openHour = if openString.contains("a.m") {
+                    let openHour = if openString.contains("a"), openString.contains("m") {
                         Int(openString.filter("0123456789".contains))!
                     } else {
-                        Int(openString)! + 12
+                        Int(openString) ?? 0 + 12
                     }
                     let openTimeComponents = DateComponents(hour: openHour, minute: 0, second: 0)
                     openTime = calendar.date(
