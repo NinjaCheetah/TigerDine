@@ -42,20 +42,24 @@ struct VisitingChefs: View {
                     Button(action: {
                         focusedIndex -= 1
                     }) {
-                        Image(systemName: "chevron.left.circle")
+                        Image(systemName: "chevron.left")
                             .font(.title)
                     }
                     .disabled(focusedIndex == 0)
                     Spacer()
-                    Text("Visiting Chefs for \(visitingChefDateDisplay.string(from: model.daysRepresented[focusedIndex]))")
-                        .font(.title)
-                        .fontWeight(.semibold)
-                        .multilineTextAlignment(.center)
+                    VStack(alignment: .center) {
+                        Text("Visiting Chefs")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                        Text(visitingChefDateDisplay.string(from: model.daysRepresented[focusedIndex]))
+                            .font(.title)
+                            .multilineTextAlignment(.center)
+                    }
                     Spacer()
                     Button(action: {
                         focusedIndex += 1
                     }) {
-                        Image(systemName: "chevron.right.circle")
+                        Image(systemName: "chevron.right")
                             .font(.title)
                     }
                     .disabled(focusedIndex == 6)

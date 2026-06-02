@@ -100,6 +100,8 @@ struct ContentView: View {
                                     searchText: $searchText
                                 )
                             }
+                        }, header: {
+                            Text(fullTextDateDisplay.string(from: model.lastRefreshed!))
                         }, footer: {
                             if let lastRefreshed = model.lastRefreshed {
                                 VStack(alignment: .center) {

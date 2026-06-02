@@ -56,6 +56,13 @@ let visitingChefDateDisplay: DateFormatter = {
     return display
 }()
 
+let fullTextDateDisplay: DateFormatter = {
+    let display = DateFormatter()
+    display.dateFormat = "EEEE, MMMM d"
+    display.locale = Locale(identifier: "en_US_POSIX")
+    return display
+}()
+
 let weekdayFromDate: DateFormatter = {
     let weekdayFormatter = DateFormatter()
     weekdayFormatter.dateFormat = "EEEE"
