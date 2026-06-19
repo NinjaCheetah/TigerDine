@@ -1,16 +1,26 @@
 {
   "fill" : {
-    "automatic-gradient" : "gray:0.90568,1.00000"
+    "automatic-gradient" : "srgb:1.00000,0.89364,0.80182,1.00000"
   },
   "groups" : [
     {
       "layers" : [
         {
-          "glass" : false,
-          "image-name" : "TigerDine Temp Logo Emblem.png",
-          "name" : "TigerDine Temp Logo Emblem",
+          "image-name" : "TigerDine Emblem Vector Paw.svg",
+          "name" : "TigerDine Emblem Vector Paw",
           "position" : {
-            "scale" : 0.9,
+            "scale" : 1.75,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "image-name" : "TigerDine Emblem Vector Cutlery.svg",
+          "name" : "TigerDine Emblem Vector Cutlery",
+          "position" : {
+            "scale" : 1.75,
             "translation-in-points" : [
               0,
               0
@@ -20,11 +30,11 @@
       ],
       "shadow" : {
         "kind" : "neutral",
-        "opacity" : 0.5
+        "opacity" : 0.6
       },
       "translucency" : {
         "enabled" : true,
-        "value" : 0.5
+        "value" : 0.2
       }
     }
   ],

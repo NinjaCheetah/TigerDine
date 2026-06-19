@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "TigerDine Temp Logo-iOS-Default-1024x1024@1x.png",
+      "filename" : "TigerDine Logo-iOS-Default-1024@1x.png",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "TigerDine Temp Logo-iOS-Dark-1024x1024@1x.png",
+      "filename" : "TigerDine Logo-iOS-Dark-1024@1x.png",
       "idiom" : "universal"
     }
   ],
