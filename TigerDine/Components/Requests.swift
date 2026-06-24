@@ -18,6 +18,7 @@ func getAllDiningInfo(date: String?) async -> Result<DiningLocationsParser, Erro
     // The endpoint requires that you specify a date, so get today's.
     let dateString: String = date ?? getTCAPIFriendlyDateString(date: Date())
     let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=\(dateString)"
+    // let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=2026-04-24"
     
     guard let url = URL(string: urlString) else {
         return .failure(URLError(.badURL))

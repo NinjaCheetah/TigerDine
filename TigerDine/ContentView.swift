@@ -84,7 +84,7 @@ struct ContentView: View {
                 VStack() {
                     List {
                         Section(content: {
-                            NavigationLink(destination: VisitingChefs()) {
+                            NavigationLink(destination: VisitingChefsView()) {
                                 Text("Upcoming Visiting Chefs")
                             }
                             NavigationLink(destination: FoodTruckView()) {
@@ -129,7 +129,7 @@ struct ContentView: View {
                 }
                 .toolbar {
                     ToolbarItemGroup(placement: .primaryAction) {
-                        NavigationLink(destination: VisitingChefPush()) {
+                        NavigationLink(destination: VisitingChefsPushView()) {
                             Image(systemName: "bell.badge")
                         }
                         Menu {

@@ -1,5 +1,5 @@
 //
-//  VisitingChefsPush.swift
+//  VisitingChefsPushView.swift
 //  TigerDine
 //
 //  Created by Campbell on 10/1/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct VisitingChefPush: View {
+struct VisitingChefsPushView: View {
     @AppStorage("visitingChefPushEnabled") var pushEnabled: Bool = false
     @AppStorage("notificationOffset") var notificationOffset: Int = 2
     
@@ -147,5 +147,5 @@ struct VisitingChefPush: View {
 }
 
 #Preview {
-    VisitingChefPush()
+    VisitingChefsPushView()
 }
