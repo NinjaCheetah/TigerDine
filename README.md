@@ -1,4 +1,4 @@
-<img width="256" height="256" alt="TigerDine Temp Logo-iOS-Default-1024x1024@1x" src="https://github.com/user-attachments/assets/6ecd71a5-884a-4135-a814-bd6473bb324e" />
+<img width="256" height="256" alt="TigerDine Logo-iOS-Default-1024@1x" src="https://github.com/user-attachments/assets/a5dd560e-7279-495b-ab6a-768badb9f5d5" />
 
 # TigerDine
 TigerDine is an unofficial app for getting information about dining locations found across the Rochester Institute of Technology campus.
@@ -19,7 +19,7 @@ TigerDine is an unofficial app for getting information about dining locations fo
 - Get visiting chef notifications, so you can be notified day-of when and where your favorite visiting chef will be on campus.
 - Home screen widgets so that the hours for your favorite dining locations can be easily accessible on your home screen (or even your Mac if the app is on your phone!).
 
-### Proposed Features:
+### Potential Future Additions:
 - Nutrition tracking, to keep track of what food you've eaten in a day (along with other potential extended meal planning features).
 - Visiting chef widgets, so you can see the next time that your favorite visiting chef will be on campus at a glance.
 
