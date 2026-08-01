@@ -20,15 +20,17 @@ struct MenuView: View {
     @State private var showingDietaryRestrictionsSheet: Bool = false
     
     func getOpenPeriods() async {
-        // Only run this if we haven't already gotten the open periods. This is somewhat of a bandaid solution to the issue of
-        // fetching this information more than once, but hey it works!
+        // Only run this if we haven't already gotten the open periods. This is somewhat of a
+        // bandaid solution to the issue of fetching this information more than once, but hey it
+        // works!
         if openPeriods.isEmpty {
             switch await getFDMealPlannerOpenings(locationId: locationId) {
             case .success(let openingResults):
                 openPeriods = openingResults.data.map { Int($0.id) }
                 selectedMealPeriod = openPeriods[0]
-                // Since this only runs once when the view first loads, we can safely use this to call the method to get the data
-                // the first time. This also ensures that it doesn't happen until we have the opening periods collected.
+                // Since this only runs once when the view first loads, we can safely use this to
+                // call the method to get the data the first time. This also ensures that it doesn't
+                // happen until we have the opening periods collected.
                 await getMenuForPeriod(mealPeriodId: selectedMealPeriod)
             case .failure(let error):
                 print(error)
@@ -45,14 +47,6 @@ struct MenuView: View {
         case .failure(let error):
             print(error)
             loadFailed = true
-        }
-    }
-    
-    func getPriceString(price: Double) -> String {
-        if price == 0.0 {
-            return "Price Unavailable"
-        } else {
-            return "$\(String(format: "%.2f", price))"
         }
     }
     
@@ -140,7 +134,7 @@ struct MenuView: View {
                                                     )
                                             }
                                         }
-                                        Text("\(item.calories) Cal • \(getPriceString(price: item.price))")
+                                        Text("\(item.calories) Cal")
                                             .foregroundStyle(.secondary)
                                     }
                                 }

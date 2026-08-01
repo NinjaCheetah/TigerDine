@@ -11,16 +11,10 @@ struct MenuItemView: View {
     @State var menuItem: FDMenuItem
     
     private var infoString: String {
-        // Calories SHOULD always be available, so start there.
-        var str = "\(menuItem.calories) Cal • "
-        // Price might be $0.00, so don't display it if that's the case because that's obviously wrong. RIT Dining would never give
-        // us free food!
-        if menuItem.price == 0.0 {
-            str += "Price Unavailable"
-        } else {
-            str += "$\(String(format: "%.2f", menuItem.price))"
-        }
-        // Same with the price, the serving size might be 0 which is also wrong so don't display that.
+        // Calories SHOULD always be available. Kinda unhelpful if the nutritional facts for
+        // something lacks its calorie count.
+        var str = "\(menuItem.calories) Cal"
+        // The serving size might be 0 which is also wrong so don't display that.
         if menuItem.servingSize != 0 {
             str += " • \(menuItem.servingSize) \(menuItem.servingSizeUnit)"
         }

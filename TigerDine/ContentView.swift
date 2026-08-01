@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    // Save sort/filter options in AppStorage so that they actually get saved.
+    // These are persistent settings, so store them with @AppStorage.
     @AppStorage("openLocationsOnly") var openLocationsOnly: Bool = false
     @AppStorage("openLocationsFirst") var openLocationsFirst: Bool = false
 
@@ -19,11 +19,11 @@ struct ContentView: View {
     
     @State private var loadFailed: Bool = false
     @State private var showingDonationSheet: Bool = false
-    @State private var showingFeedbackSheet: Bool = false
     @State private var searchText: String = ""
     @State private var path = NavigationPath()
     
-    // Small wrapper around the method on the model so that errors can be handled by showing the uh error screen.
+    // Small wrapper around the method on the model so that errors can be handled by showing the
+    // uh error screen.
     private func getDiningData(bustCache: Bool = false) async {
         do {
             if bustCache {
@@ -37,14 +37,15 @@ struct ContentView: View {
         }
     }
     
-    // Start a perpetually running timer to refresh the open statuses, so that they automatically switch as appropriate without
-    // needing to refresh the data. You don't need to yell at the API again to know that the location opening at 11:00 AM should now
-    // display "Open" instead of "Opening Soon" now that it's 11:01.
+    // Start a perpetually running timer to refresh the open statuses, so that they automatically
+    // switch as appropriate without needing to refresh the data. You don't need to yell at the API
+    // again to know that the location opening at 11:00 AM should now display "Open" instead of
+    // "Opening Soon" now that it's 11:01.
     private func updateOpenStatuses() async {
         Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
             model.updateOpenStatuses()
-            // If the last refreshed date isn't today, that means we probably passed midnight and need to refresh the data.
-            // So do that.
+            // If the last refreshed date isn't today, that means we probably passed midnight and
+            // need to refresh the data. So do that.
             if !Calendar.current.isDateInToday(model.lastRefreshed ?? Date()) {
                 Task {
                     await getDiningData()
@@ -65,9 +66,9 @@ struct ContentView: View {
         print("TigerDine opened to \(location.name)")
         // Reset the path back to the root (which is here, ContentView).
         path = NavigationPath()
-        // Do this in an async block because apparently SwiftUI won't handle these two NavigationPath changes
-        // consecutively. Putting the second change in an async block makes it actually update the path the
-        // second time.
+        // Do this in an async block because apparently SwiftUI won't handle these two
+        // NavigationPath changes consecutively. Putting the second change in an async block makes
+        // it actually update the path the second time.
         DispatchQueue.main.async {
             path.append(location)
             self.targetLocationId = nil
@@ -92,7 +93,8 @@ struct ContentView: View {
                             }
                         })
                         Section(content: {
-                            // Prevents crashing if the list is empty. Which shouldn't ever happen but still.
+                            // Prevents crashing if the list is empty. Which shouldn't ever happen,
+                            // but still.
                             if !model.locationsByDay.isEmpty {
                                 LocationList(
                                     openLocationsFirst: $openLocationsFirst,
@@ -140,6 +142,7 @@ struct ContentView: View {
                             }) {
                                 Label("Refresh", systemImage: "arrow.clockwise")
                             }
+                            
                             #if DEBUG
                             Button(action: {
                                 model.lastRefreshed = Date(timeIntervalSince1970: 0.0)
@@ -147,16 +150,18 @@ struct ContentView: View {
                                 Label("Invalidate Cache", systemImage: "ant")
                             }
                             #endif
+                            
                             Divider()
+                            
                             NavigationLink(destination: AboutView()) {
                                 Image(systemName: "info.circle")
                                 Text("About")
                             }
-                            Button(action: {
-                                showingFeedbackSheet = true
-                            }) {
+                            
+                            NavigationLink(destination: FeedbackView()) {
                                 Label("Feedback", systemImage: "paperplane")
                             }
+                            
                             Button(action: {
                                 showingDonationSheet = true
                             }) {
@@ -194,9 +199,6 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingDonationSheet) {
             DonationView()
-        }
-        .sheet(isPresented: $showingFeedbackSheet) {
-            FeedbackView()
         }
     }
 }

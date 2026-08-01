@@ -15,8 +15,8 @@ class DiningModel {
     var lastRefreshed: Date? {
         get {
             let sharedDefaults = UserDefaults(suiteName: "group.dev.ninjacheetah.RIT-Dining")
-            // If this fails, we should default to an interval of 0. 1970 is obviously going to register as stale cache and will
-            // trigger a reload.
+            // If this fails, we should default to a time offset of 0. 1970 is obviously going to
+            // register as stale cache and will trigger a reload.
             return Date(timeIntervalSince1970: sharedDefaults?.double(forKey: "lastRefreshed") ?? 0.0)
         }
         set {
@@ -43,7 +43,11 @@ class DiningModel {
         daysRepresented = week
     }
     
-    /// This is the actual method responsible for making requests to the API for the current day and next 6 days to collect all of the information that the app needs for the various view. Making it part of the model allows it to be updated from any view at any time, and prevents excess API requests (if you never refresh, the app will never need to make more than 7 calls per launch).
+    /// This is the actual method responsible for making requests to the API for the current day
+    /// and next 6 days to collect all of the information that the app needs for the various view.
+    /// Making it part of the model allows it to be updated from any view at any time, and
+    /// prevents excess API requests (if you never refresh, the app will never need to make more
+    /// than 7 calls per launch).
     func getHoursByDay() async throws {
         print("loading from network")
         await getDaysRepresented()
@@ -56,7 +60,10 @@ class DiningModel {
             case .success(let locations):
                 var newDiningLocations = [DiningLocation]()
                 for i in 0..<locations.locations.count {
-                    let diningInfo = parseLocationInfo(location: locations.locations[i], forDate: day)
+                    let diningInfo = parseLocationInfo(
+                        location: locations.locations[i],
+                        forDate: day
+                    )
                     newDiningLocations.append(diningInfo)
                 }
                 newLocationsByDay.append(newDiningLocations)
@@ -90,7 +97,8 @@ class DiningModel {
         isLoaded = true
     }
     
-    /// Wrapper function for the real getHoursByDay() that checks the last refreshed stamp and uses cached data if it's fresh or triggers a refresh if it's stale.
+    /// Wrapper function for the real getHoursByDay() that checks the last refreshed stamp and uses
+    ///  cached data if it's fresh or triggers a refresh if it's stale.
     func getHoursByDayCached() async throws {
         let now = Date()
         // If we can't access the lastRefreshed key, then there is likely no cache.
@@ -101,13 +109,17 @@ class DiningModel {
                 await getDaysRepresented()
                 let decoder = JSONDecoder()
                 
-                // These checks ensure that the key can actually be loaded from UserDefaults and that the cached JSON data can
-                // actually be loaded from the cache before trying to use it, to prevent potential crashes from force unwrapping
-                // it. Currently unclear on what could make these fail if the lastRefreshed date loaded as today, but this should
-                // mitigate it by falling back on a network load if they do.
+                // These checks ensure that the key can actually be loaded from UserDefaults and
+                // that the cached JSON data can actually be loaded from the cache before trying to
+                // use it, to prevent potential crashes from force unwrapping it. Currently unclear
+                // on what could make these fail if the lastRefreshed date loaded as today, but this
+                // should mitigate it by falling back on a network load if they do.
                 if let cacheUserDefaults = UserDefaults(suiteName: "group.dev.ninjacheetah.RIT-Dining") {
                     if let cacheData = cacheUserDefaults.data(forKey: "cachedLocationsByDay") {
-                        let cachedLocationsByDay = try decoder.decode([[DiningLocation]].self, from: cacheData)
+                        let cachedLocationsByDay = try decoder.decode(
+                            [[DiningLocation]].self,
+                            from: cacheData
+                        )
                         
                         // Load cache, update open status, do a notification cleanup, and return. We only need to clean up because
                         // loading cache means that there can't be any new notifications to schedule since the last real data refresh.
@@ -130,7 +142,8 @@ class DiningModel {
         try await getHoursByDay()
     }
     
-    /// Iterates through all of the locations and updates their open status indicator based on the current time. Does a replace to make sure that it updates any views observing this model.
+    /// Iterates through all of the locations and updates their open status indicator based on the
+    /// current time. Does a replace to make sure that it updates any views observing this model.
     func updateOpenStatuses() {
         locationsByDay = locationsByDay.map { day in
             day.map { location in
@@ -166,16 +179,19 @@ class DiningModel {
         pushSchedulerLock = false
     }
     
-    /// Cleans up old push notifications that have already been delivered so that we're not still tracking them forever.
+    /// Cleans up old push notifications that have already been delivered so that we're not still
+    /// tracking them forever.
     func cleanupPushes() async {
         let now = Date()
         for push in visitingChefPushes.pushes {
             if now > push.endTime {
-                // Guard this with an if let to avoid force unwrapping the index. That's something that theoretically
-                // should always be safe given that this is iterating over elements so obviously that element should exist,
-                // however there was an issue where this would sometimes unwrap a nil. My theory is that there was a small
-                // chance of this task getting run twice concurrently under certain conditions, and so one would remove the
-                // notification right before the other tried, and then it would be gone and the index would be nil.
+                // Guard this with an if let to avoid force unwrapping the index. That's something
+                // that theoretically should always be safe given that this is iterating over
+                // elements so obviously that element should exist,  however there was an issue
+                // where this would sometimes unwrap a nil. My theory is that there was a small
+                // chance of this task getting run twice concurrently under certain conditions, and
+                // so one would remove the notification right before the other tried, and then it
+                // would be gone and the index would be nil.
                 if let pushIndex = visitingChefPushes.pushes.firstIndex(of: push) {
                     visitingChefPushes.pushes.remove(at: pushIndex)
                 }
