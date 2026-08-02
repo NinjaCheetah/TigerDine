@@ -289,8 +289,8 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                 let splitString = menu.name.split(separator: "(", maxSplits: 1)
                 specials.append(
                     DailySpecial(
-                        name: String(splitString[0]),
-                        type: String(splitString.count > 1 ? String(splitString[1]) : "").replacingOccurrences(of: ")", with: "")
+                        name: String(splitString[0]).capitalized,
+                        type: String(splitString.count > 1 ? String(splitString[1]) : "").replacingOccurrences(of: ")", with: "").capitalized
                     )
                 )
             }
