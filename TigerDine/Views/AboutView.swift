@@ -46,6 +46,7 @@ struct AboutView: View {
                     .padding(.top, 4)
                 }
                 .frame(maxWidth: .infinity)
+                .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
                 .listRowBackground(Color.clear)
             }
             
@@ -83,6 +84,7 @@ struct AboutView: View {
                 EmptyView()
             }
         }
+        .contentMargins(.top, 0)
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -16,16 +16,17 @@ struct FeedbackView: View {
     
     var body: some View {
         List {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Did I break something? Oops.")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                Text("Or maybe you just have a suggestion to make TigerDine even cooler. Either way, I'd love to hear your feedback! (Or maybe the hours for a location are off, in which case that feedback is RIT's to handle.)")
-                    .foregroundStyle(.secondary)
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Did I break something? Oops.")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    Text("Or maybe you just have a suggestion to make TigerDine even cooler. Either way, I'd love to hear your feedback! (Or maybe the hours for a location are off, in which case that feedback is RIT's to handle.)")
+                        .foregroundStyle(.secondary)
+                }
+                .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 8, trailing: 8))
+                .listRowBackground(Color.clear)
             }
-            .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 8, trailing: 8))
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
             
             Section(
                 header: Text("Incorrect Location Hours"),
@@ -123,6 +124,7 @@ struct FeedbackView: View {
                 }
             }
         }
+        .contentMargins(.top, 0)
         .navigationTitle("Feedback")
         .navigationBarTitleDisplayMode(.inline)
     }

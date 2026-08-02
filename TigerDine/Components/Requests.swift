@@ -110,10 +110,12 @@ func getFoodTruckPage() async -> Result<String, Error> {
         let contents = try String(contentsOf: url)
         let scheduleRegex = /<div class=\".*?field--name-field-event-description.*?\">([\s\S]*?)<\/div>/
         if let match = contents.firstMatch(of: scheduleRegex) {
+            print("successfully matched base food truck html")
             return .success(String(match.0))
         }
         return .success(contents)
     } catch {
+        print("failed to get base food truck html")
         return .failure(error)
     }
 }

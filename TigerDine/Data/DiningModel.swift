@@ -121,8 +121,9 @@ class DiningModel {
                             from: cacheData
                         )
                         
-                        // Load cache, update open status, do a notification cleanup, and return. We only need to clean up because
-                        // loading cache means that there can't be any new notifications to schedule since the last real data refresh.
+                        // Load cache, update open status, do a notification cleanup, and return.
+                        // We only need to clean up because loading cache means that there can't be
+                        // any new notifications to schedule since the last real data refresh.
                         locationsByDay = cachedLocationsByDay
                         updateOpenStatuses()
                         await cleanupPushes()

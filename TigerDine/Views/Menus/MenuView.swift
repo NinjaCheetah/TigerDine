@@ -113,14 +113,14 @@ struct MenuView: View {
                         Section {
                             ForEach(filteredMenuItems) { item in
                                 NavigationLink(destination: MenuItemView(menuItem: item)) {
-                                    VStack(alignment: .leading) {
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text(item.name)
                                         HStack {
-                                            Text(item.name)
                                             ForEach(item.dietaryMarkers, id: \.self) { dietaryMarker in
                                                 Text(dietaryMarker)
                                                     .foregroundStyle(Color.white)
                                                     .font(.caption)
-                                                    .padding(5)
+                                                    .padding(4)
                                                     .background(
                                                         RoundedRectangle(cornerRadius: 16)
                                                             .fill({
