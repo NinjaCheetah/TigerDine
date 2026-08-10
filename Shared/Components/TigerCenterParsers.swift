@@ -9,12 +9,13 @@ import Foundation
 
 /// Gets the current open status of a location based on the open time and close time.
 func parseOpenStatus(openTime: Date, closeTime: Date, referenceTime: Date) -> OpenStatus {
-    // If the location is open but the close time is within the next 30 minutes, label it as closing soon, and do the opposite
-    // if it's closed but the open time is within the next 30 minutes.
+    // If the location is open but the close time is within the next 30 minutes, label it as
+    // closing soon, and do the opposite if it's closed but the open time is within the next 30
+    // minutes.
     let calendar = Calendar.current
     if referenceTime >= openTime && referenceTime <= closeTime {
-        // This is basically just for Bytes, it checks the case where the open and close times are exactly 24 hours apart, which is
-        // only true for 24-hour locations.
+        // This is basically just for Bytes, it checks the case where the open and close times are
+        // exactly 24 hours apart, which is only true for 24-hour locations.
         if closeTime == calendar.date(byAdding: .day, value: 1, to: openTime)! {
             return .open
         } else if closeTime < calendar.date(byAdding: .minute, value: 30, to: referenceTime)! {
@@ -43,17 +44,19 @@ func parseMultiOpenStatus(diningTimes: [DiningTimes]?, referenceTime: Date) -> O
             referenceTime: referenceTime
         )
         
-        // If we're closing soon for the current opening period, but then we're opening again at the same time we close in the next
-        // period, we should just stick with "Open" because showing "Closing Soon" for 30 minutes and then going straight back to
-        // "Open" is kinda confusing. This issue has been observed with Petals specifically.
+        // If we're closing soon for the current opening period, but then we're opening again at
+        // the same time we close in the next period, we should just stick with "Open" because
+        // showing "Closing Soon" for 30 minutes and then going straight back to "Open" is kinda
+        // confusing. This issue has been observed with Petals specifically.
         if openStatus == .closingSoon && i != diningTimes.indices.last {
             if diningTimes[i].closeTime == diningTimes[i + 1].openTime {
                 openStatus = .open
             }
         }
         
-        // If the first event pass came back closed, loop again in case a later event has a different status. This is mostly to
-        // accurately catch Gracie's/Brick City Cafe's multiple open periods each day.
+        // If the first event pass came back closed, loop again in case a later event has a
+        // different status. This is mostly to accurately catch Gracie's/Brick City Cafe's
+        // multiple open periods each day.
         if openStatus != .closed {
             return openStatus
         }
@@ -66,10 +69,12 @@ func parseMultiOpenStatus(diningTimes: [DiningTimes]?, referenceTime: Date) -> O
 func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> DiningLocation {
     print("beginning parse for \(location.name) (id: \(location.id))")
     
-    // The descriptions sometimes have HTML <br /> tags despite also having \n. Those need to be removed.
+    // The descriptions sometimes have HTML <br /> tags despite also having \n. Those need to be
+    // removed.
     let desc = location.description.replacingOccurrences(of: "<br />", with: "")
     
-    // Check if this location's ID is in the TigerCenter -> FD MealPlanner ID map and save those IDs if it is.
+    // Check if this location's ID is in the TigerCenter -> FD MealPlanner ID map and save those
+    // IDs if it is.
     let fdmpIds: FDMPIds? = if tCtoFDMPMap.keys.contains(location.id) {
         FDMPIds(
             locationId: tCtoFDMPMap[location.id]!.0,
@@ -79,11 +84,12 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
         nil
     }
     
-    // Generate a maps URL from the mdoId key. This is required because the mapsUrl served by TigerCenter is not compatible with
-    // the new RIT map that was deployed in December 2025.
+    // Generate a maps URL from the mdoId key. This is required because the mapsUrl served by
+    // TigerCenter is not compatible with the new RIT map that was deployed in December 2025.
     let mapsUrl = "https://maps.rit.edu/?mdo_id=\(location.mdoId)"
     
-    // Early return if there are no events, good for things like the food trucks which can very easily have no openings in a week.
+    // Early return if there are no events, good for things like the food trucks which can very
+    // easily have no openings in a week.
     if location.events.isEmpty {
         return DiningLocation(
             id: location.id,
@@ -104,29 +110,34 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
     var openStrings: [String] = []
     var closeStrings: [String] = []
     
-    // Dining locations have a regular schedule, but then they also have exceptions listed for days like weekends or holidays. If there
-    // are exceptions, use those times for the day, otherwise we can just use the default times. Also check for repeats! The response
-    // data can include those somtimes, for reasons:tm:
+    // Dining locations have a regular schedule, but then they also have exceptions listed for
+    // days like weekends or holidays. If there are exceptions, use those times for the day,
+    // otherwise we can just use the default times. Also check for repeats! The response data can
+    // include those somtimes, for reasons:tm:
     for event in location.events {
         if let exceptions = event.exceptions,
             !exceptions.isEmpty,
-           // This additional check is necessary, because sometimes the exceptions are silly and are doing something like marking
-           // a location as closed on a day that isn't included in the regular schedule anyway. That breaks things. This check
-           // ensures that the exception being looked at applies for the day we're parsing for before trying to follow it.
+            // This additional check is necessary, because sometimes the exceptions are silly and
+            // are doing something like marking a location as closed on a day that isn't included in
+            // the regular schedule anyway. That breaks things. This check ensures that the
+            //exception being looked at applies for the day we're parsing for before trying to follow it.
             exceptions[0].daysOfWeek.contains(weekdayFromDate.string(from: forDate ?? Date()).uppercased())
         {
-            // Only save the exception times if the location is actually open during those times, and if these times aren't a repeat.
-            // I've seen repeats for Brick City Cafe specifically, where both the breakfast and lunch standard open periods had
-            // exceptions listing the same singluar brunch period. That feels like a stupid choice but oh well.
+            // Only save the exception times if the location is actually open during those times,
+            // and if these times aren't a repeat. I've seen repeats for Brick City Cafe
+            // specifically, where both the breakfast and lunch standard open periods had
+            // exceptions listing the same singluar brunch period. That feels like a stupid choice
+            // but oh well.
             if exceptions[0].open, !openStrings.contains(exceptions[0].startTime), !closeStrings.contains(exceptions[0].endTime) {
                 openStrings.append(exceptions[0].startTime)
                 closeStrings.append(exceptions[0].endTime)
             }
         } else {
             if !openStrings.contains(event.startTime), !closeStrings.contains(event.endTime) {
-                // Verify that the current weekday falls within the schedule. The regular event schedule specifies which days of the
-                // week it applies to, and if the current day isn't in that list and there are no exceptions, that means there are no
-                // hours for this location.
+                // Verify that the current weekday falls within the schedule. The regular event
+                // schedule specifies which days of the week it applies to, and if the current day
+                // isn't in that list and there are no exceptions, that means there are no hours
+                // for this location.
                 if event.daysOfWeek.contains(weekdayFromDate.string(from: forDate ?? Date()).uppercased()) {
                     openStrings.append(event.startTime)
                     closeStrings.append(event.endTime)
@@ -135,8 +146,8 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
         }
     }
     
-    // Early return if there are no valid opening times, most likely because the day's exceptions dictate that the location is closed.
-    // Mostly comes into play on holidays.
+    // Early return if there are no valid opening times, most likely because the day's exceptions
+    // dictate that the location is closed.  Mostly comes into play on holidays.
     if openStrings.isEmpty || closeStrings.isEmpty {
         return DiningLocation(
             id: location.id,
@@ -171,14 +182,14 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
             bySettingHour: openTimeComponents.hour!,
             minute: openTimeComponents.minute!,
             second: openTimeComponents.second!,
-            of: now)!
+            of: forDate ?? now)!
         )
         
         closeDates.append(calendar.date(
             bySettingHour: closeTimeComponents.hour!,
             minute: closeTimeComponents.minute!,
             second: closeTimeComponents.second!,
-            of: now)!
+            of: forDate ?? now)!
         )
     }
     var diningTimes: [DiningTimes] = []
@@ -186,33 +197,37 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
         diningTimes.append(DiningTimes(openTime: openDates[i], closeTime: closeDates[i]))
     }
     
-    // If the closing time is less than or equal to the opening time, it's probably midnight and means either open until midnight
-    // or open 24/7, in the case of Bytes.
+    // If the closing time is less than or equal to the opening time, it's probably midnight and
+    // means either open until midnight or open 24/7, in the case of Bytes.
     for i in diningTimes.indices {
         if diningTimes[i].closeTime <= diningTimes[i].openTime {
             diningTimes[i].closeTime = calendar.date(byAdding: .day, value: 1, to: diningTimes[i].closeTime)!
         }
     }
     
-    // Sometimes the openings are not in order, for some reason. I'm observing this with Brick City, where for some reason the early
-    // opening is event 1, and the later opening is event 0. This is silly so let's reverse it.
+    // Sometimes the openings are not in order, for some reason. I'm observing this with Brick City,
+    // where for some reason the early opening is event 1, and the later opening is event 0. This
+    // is silly so let's reverse it.
     diningTimes.sort { $0.openTime < $1.openTime }
     
-    // Get the current open status for a location. Details about how this works can be seen in the docs for parseOpenStatus().
+    // Get the current open status for a location. Details about how this works can be seen in the
+    // docs for parseOpenStatus().
     var openStatus: OpenStatus = .closed
     for i in diningTimes.indices {
         openStatus = parseOpenStatus(openTime: diningTimes[i].openTime, closeTime: diningTimes[i].closeTime, referenceTime: now)
-        // If the first event pass came back closed, loop again in case a later event has a different status. This is mostly to
-        // accurately catch Gracie's multiple open periods each day.
+        // If the first event pass came back closed, loop again in case a later event has a
+        // different status. This is mostly to accurately catch Gracie's multiple open periods
+        // each day.
         if openStatus != .closed {
             break
         }
     }
     
-    // Parse the "menus" array and keep track of visiting chefs at this location, if there are any. If not then we can just save nil.
-    // The time formats used for visiting chefs are inconsistent and suck so that part of this code might be kind of rough. I can
-    // probably make it a little better but I think most of the blame goes to TigerCenter here.
-    // Also save the daily specials. This is more of a footnote because that's just taking a string and saving it as two strings.
+    // Parse the "menus" array and keep track of visiting chefs at this location, if there are any.
+    // If not then we can just save nil. The time formats used for visiting chefs are inconsistent
+    // and suck so that part of this code might be kind of rough. I can probably make it a little
+    // better but I think most of the blame goes to TigerCenter here. Also save the daily specials.
+    // This is more of a footnote because that's just taking a string and saving it as two strings.
     let visitingChefs: [VisitingChef]?
     let dailySpecials: [DailySpecial]?
     if !location.menus.isEmpty {
@@ -224,8 +239,9 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                 var name: String = menu.name
                 let splitString = name.split(separator: "(", maxSplits: 1)
                 name = String(splitString[0]).trimmingCharacters(in: .whitespaces)
-                // Time parsing nonsense starts here. Extracts the time from a string like "Chef (4-7p.m.)", splits it at the "-",
-                // strips the non-numerical characters from each part, parses it as a number and adds 12 hours as needed, then creates
+                // Time parsing nonsense starts here. Extracts the time from a string like
+                // "Chef (4-7p.m.)", splits it at the "-", strips the non-numerical characters
+                // from each part, parses it as a number and adds 12 hours as needed, then creates
                 // a Date instance for that time on today's date.
                 let timeStrings = String(splitString[1]).replacingOccurrences(of: ")", with: "").split(separator: "-", maxSplits: 1)
                 print("raw open range: \(timeStrings)")
@@ -248,8 +264,9 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                     break
                 }
                 if let closeString = timeStrings.last?.filter("0123456789".contains) {
-                    // I've chosen to assume that no visiting chef will ever close in the morning. This could bad choice but I have
-                    // yet to see any evidence of a visiting chef leaving before noon so far.
+                    // I've chosen to assume that no visiting chef will ever close in the morning.
+                    // This could bad choice but I have yet to see any evidence of a visiting chef
+                    // leaving before noon so far.
                     let closeHour = Int(closeString)! + 12
                     let closeTimeComponents = DateComponents(hour: closeHour, minute: 0, second: 0)
                     closeTime = calendar.date(
@@ -279,7 +296,8 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
                 
                 chefs.append(VisitingChef(
                     name: name,
-                    description: menu.description ?? "No description available", // Some don't have descriptions, apparently.
+                    // Some don't have descriptions, apparently.
+                    description: menu.description ?? "No description available",
                     openTime: openTime,
                     closeTime: closeTime,
                     status: visitngChefStatus)
@@ -319,8 +337,8 @@ func parseLocationInfo(location: DiningLocationParser, forDate: Date?) -> Dining
 }
 
 extension DiningLocation {
-    // Updates the open status of a location and of its visiting chefs, so that the labels in the UI update automatically as
-    // time progresses and locations open/close/etc.
+    // Updates the open status of a location and of its visiting chefs, so that the labels in the
+    // UI update automatically as time progresses and locations open/close/etc.
     mutating func updateOpenStatus() {
         let now = Date()
         // Gets the open status with the multi opening period compatible function.

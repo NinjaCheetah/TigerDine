@@ -49,6 +49,13 @@ let dateDisplay: DateFormatter = {
     return display
 }()
 
+let upNextDisplay: DateFormatter = {
+    let display = DateFormatter()
+    display.timeZone = TimeZone(identifier: "America/New_York")
+    display.dateFormat = "h:mm a EEE"
+    return display
+}()
+
 let visitingChefDateDisplay: DateFormatter = {
     let display = DateFormatter()
     display.dateFormat = "EEEE, MMM d"

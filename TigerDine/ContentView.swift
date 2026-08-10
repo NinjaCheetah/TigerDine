@@ -91,6 +91,8 @@ struct ContentView: View {
                             NavigationLink(destination: FoodTruckView()) {
                                 Text("Weekend Food Trucks")
                             }
+                        }, header: {
+                            Text(fullTextDateDisplay.string(from: model.lastRefreshed!))
                         })
                         Section(content: {
                             // Prevents crashing if the list is empty. Which shouldn't ever happen,
@@ -102,8 +104,6 @@ struct ContentView: View {
                                     searchText: $searchText
                                 )
                             }
-                        }, header: {
-                            Text(fullTextDateDisplay.string(from: model.lastRefreshed!))
                         }, footer: {
                             if let lastRefreshed = model.lastRefreshed {
                                 VStack(alignment: .center) {

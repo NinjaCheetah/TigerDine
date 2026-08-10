@@ -11,14 +11,14 @@ enum InvalidHTTPError: Error {
     case invalid
 }
 
-// This code has now been mostly rewritten to be pretty and async instead of being horrifying callback based code in a context where
-// callback based code made no sense. I love async!
+// This code has now been mostly rewritten to be pretty and async instead of being horrifying
+// callback based code in a context where callback based code made no sense. I love async!
 // Get information for all dining locations.
-func getAllDiningInfo(date: String?) async -> Result<DiningLocationsParser, Error> {
+func getAllDiningInfo(date: Date?) async -> Result<DiningLocationsParser, Error> {
     // The endpoint requires that you specify a date, so get today's.
-    let dateString: String = date ?? getTCAPIFriendlyDateString(date: Date())
+    let dateString: String = getTCAPIFriendlyDateString(date: date ?? Date())
     let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=\(dateString)"
-    // let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=2026-04-24"
+//    let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=2026-04-24"
     
     guard let url = URL(string: urlString) else {
         return .failure(URLError(.badURL))

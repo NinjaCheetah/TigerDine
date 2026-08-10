@@ -151,6 +151,8 @@ struct MenuItemView: View {
 #Preview {
     MenuItemView(
         menuItem: FDMenuItem(
+            // I hate having to manually define stuff like this for previews. But not as much as I
+            // would've hated implementing the nutrition label without a preview!
             id: 0,
             name: "Bacon, Gouda, & Egg Sandwich",
             exactName: "Sandwich Bacon Egg Gouda BNZ",

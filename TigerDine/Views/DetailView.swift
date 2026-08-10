@@ -59,6 +59,50 @@ struct DetailView: View {
         return newWeeklyHours
     }
     
+    private var upNextString: String {
+        var newUpNextString = ""
+        if location.open == .open || location.open == .closingSoon {
+            if let diningTimes = location.diningTimes {
+                for time in diningTimes {
+                    if time.closeTime > Date() {
+                        newUpNextString = "Closes \(dateDisplay.string(from: time.closeTime))"
+                        break
+                    }
+                }
+            }
+        } else {
+            for day in model.locationsByDay {
+                if newUpNextString != "" {
+                    break
+                }
+
+                for location in day {
+                    if location.id == locationId {
+                        if let diningTimes = location.diningTimes {
+                            for time in diningTimes {
+                                print("doing compare for \(location.name)")
+                                print("open time compared against now: \(time.openTime)")
+                                if time.openTime > Date() {
+                                    newUpNextString = "Opens \(upNextDisplay.string(from: time.openTime))"
+                                    break
+                                }
+                            }
+                        }
+                        // If this code is running, we already found our location match, and since
+                        // there won't ever be another match we should stop looping for no reason.
+                        break
+                    }
+                }
+            }
+        }
+        // This condition should only ever be true if a location is closed all 7 days that we have
+        // data for, so the fallback is to say "Closed this week".
+        if newUpNextString == "" {
+            newUpNextString = "Closed this week"
+        }
+        return newUpNextString
+    }
+    
     // Still a little broken, does not work for refresh. Need to fix.
     private func getOccupancy() async {
         // Only fetch occupancy data if the location is actually open right now. Otherwise, just exit early and hide the spinner.
@@ -107,15 +151,8 @@ struct DetailView: View {
                                 .font(.title3)
                                 .foregroundStyle(.orange)
                         }
-                        if let times = location.diningTimes, !times.isEmpty {
-                            ForEach(times, id: \.self) { time in
-                                Text("\(dateDisplay.string(from: time.openTime)) - \(dateDisplay.string(from: time.closeTime))")
-                                    .foregroundStyle(.secondary)
-                            }
-                        } else {
-                            Text("Not Open Today")
-                                .foregroundStyle(.secondary)
-                        }
+                        Text(upNextString)
+                            .foregroundStyle(.secondary)
                     }
 //                    #if DEBUG
 //                    HStack(spacing: 0) {

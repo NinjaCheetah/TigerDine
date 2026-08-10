@@ -53,10 +53,7 @@ class DiningModel {
         await getDaysRepresented()
         var newLocationsByDay = [[DiningLocation]]()
         for day in daysRepresented {
-            let dateString = day.formatted(.iso8601
-                .year().month().day()
-                .dateSeparator(.dash))
-            switch await getAllDiningInfo(date: dateString) {
+            switch await getAllDiningInfo(date: day) {
             case .success(let locations):
                 var newDiningLocations = [DiningLocation]()
                 for i in 0..<locations.locations.count {
