@@ -80,8 +80,6 @@ struct DetailView: View {
                     if location.id == locationId {
                         if let diningTimes = location.diningTimes {
                             for time in diningTimes {
-                                print("doing compare for \(location.name)")
-                                print("open time compared against now: \(time.openTime)")
                                 if time.openTime > Date() {
                                     newUpNextString = "Opens \(upNextDisplay.string(from: time.openTime))"
                                     break
@@ -105,7 +103,8 @@ struct DetailView: View {
     
     // Still a little broken, does not work for refresh. Need to fix.
     private func getOccupancy() async {
-        // Only fetch occupancy data if the location is actually open right now. Otherwise, just exit early and hide the spinner.
+        // Only fetch occupancy data if the location is actually open right now. Otherwise, just
+        // exit early and hide the spinner.
         if location.open == .open || location.open == .closingSoon {
             occupancyLoading = true
             switch await getOccupancyPercentage(mdoId: location.mdoId) {

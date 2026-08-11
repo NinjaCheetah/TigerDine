@@ -76,6 +76,12 @@ let weekdayFromDate: DateFormatter = {
     return weekdayFormatter
 }()
 
+let weekdayShortFromDate: DateFormatter = {
+    let weekdayFormatter = DateFormatter()
+    weekdayFormatter.dateFormat = "EEE"
+    return weekdayFormatter
+}()
+
 // Custom view extension that just applies modifiers in a block to the object it's applied to. Mostly useful for splitting up conditional
 // modifiers that should only be applied for certain OS versions. (A returning feature from RNGTool!)
 extension View {
