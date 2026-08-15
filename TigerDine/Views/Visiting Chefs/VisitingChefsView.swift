@@ -265,7 +265,7 @@ struct VisitingChefsView: View {
     
     var mockLocationsByDay: [[DiningLocation]] = []
 
-    for i in 0..<7 {
+    for _ in 0..<7 {
         mockLocationsByDay.append([mockLocation])
     }
     
