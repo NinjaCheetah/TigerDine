@@ -86,9 +86,6 @@ struct VisitingChefsView: View {
                                             Text(chef.name)
                                                 .fontWeight(.semibold)
                                             
-                                            Text(chef.description)
-                                                .foregroundStyle(.secondary)
-                                            
                                             if index == 0 {
                                                 switch chef.status {
                                                 case .hereNow:
@@ -119,7 +116,8 @@ struct VisitingChefsView: View {
                                             )
                                             .foregroundStyle(.secondary)
 
-                                            
+                                            Text(chef.description)
+                                                .foregroundStyle(.secondary)
                                         }
                                     }
                                 }

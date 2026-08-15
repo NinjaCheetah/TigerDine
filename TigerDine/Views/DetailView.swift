@@ -60,10 +60,18 @@ struct DetailView: View {
     }
     
     private var upNextString: String {
+        let calendar = Calendar.current
         var newUpNextString = ""
         if location.open == .open || location.open == .closingSoon {
             if let diningTimes = location.diningTimes {
                 for time in diningTimes {
+                    // This case is here pretty much exclusively for Bytes, so that the string
+                    // doesn't perpetually say that Bytes will close at 12:00 AM.
+                    if time.closeTime == calendar.date(byAdding: .day, value: 1, to: time.openTime)! {
+                        newUpNextString = "Open 24 Hours"
+                        break
+                    }
+                    
                     if time.closeTime > Date() {
                         newUpNextString = "Closes \(dateDisplay.string(from: time.closeTime))"
                         break
@@ -81,8 +89,13 @@ struct DetailView: View {
                         if let diningTimes = location.diningTimes {
                             for time in diningTimes {
                                 if time.openTime > Date() {
-                                    newUpNextString = "Opens \(upNextDisplay.string(from: time.openTime))"
-                                    break
+                                    if calendar.isDateInToday(time.openTime) {
+                                        newUpNextString = "Opens \(dateDisplay.string(from: time.openTime)) Today"
+                                        break
+                                    } else {
+                                        newUpNextString = "Opens \(upNextDisplay.string(from: time.openTime))"
+                                        break
+                                    }
                                 }
                             }
                         }
