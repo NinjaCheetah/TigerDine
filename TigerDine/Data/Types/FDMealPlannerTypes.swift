@@ -41,7 +41,9 @@ struct FDMealPeriodsParser: Decodable {
     let data: [Data]
 }
 
-/// Struct to parse the response from the FDMP meals API. This API contains the actual menu information for the specified location during the specified meal period. It doesn't contain every menu item, but it's the best source of menu information that I can access.
+/// Struct to parse the response from the FDMP meals API. This API contains the actual menu
+/// information for the specified location during the specified meal period. It doesn't contain
+/// every menu item, but it's the best source of menu information that I can access.
 struct FDMealsParser: Decodable, Hashable {
     /// The actual response body.
     struct Result: Decodable, Hashable {
@@ -52,6 +54,7 @@ struct FDMealsParser: Decodable, Hashable {
             let componentTypeId: Int
             let englishAlternateName: String
             let category: String
+            let rowId: Int
             let allergenName: String
             let calories: String
             let carbohydrates: String
@@ -87,6 +90,17 @@ struct FDMealsParser: Decodable, Hashable {
             let productMeasuringSizeUnit: String
             let itemsToOrder: Int
         }
+        /// An individual concept that the recipe at the matching index maps on to.
+        struct Concept: Decodable, Hashable {
+            let menuConceptId: Int
+            let menuId: Int
+            let conceptId: Int
+            let conceptName: String
+            let strWeekStartDate: String
+            let strWeekEndDate: String
+            let rowId: Int
+            let weekId: Int
+        }
         let menuId: Int
         let menuForDate: String
         let menuToDate: String
@@ -94,7 +108,10 @@ struct FDMealsParser: Decodable, Hashable {
         let accountName: String
         let menuTypeName: String
         let mealPeriodId: Int
+        let strWeekStartDate: String
+        let strWeekEndDate: String
         let allMenuRecipes: [MenuRecipe]?
+        let conceptData: [Concept]?
     }
     let responseStatus: String?
     let result: [Result]
@@ -111,6 +128,7 @@ struct FDNutritionalEntry: Hashable {
 struct FDMenuItem: Hashable, Identifiable {
     let id: Int
     let name: String
+    let rowId: Int
     let exactName: String
     let category: String
     let allergens: [String]

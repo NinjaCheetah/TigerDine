@@ -11,6 +11,7 @@ struct MenuView: View {
     @State var accountId: Int
     @State var locationId: Int
     @State private var menuItems: [FDMenuItem] = []
+    @State private var conceptToItemsMap: [String: [Int]] = [:]
     @State private var searchText: String = ""
     @State private var isLoading: Bool = true
     @State private var loadFailed: Bool = false
@@ -42,7 +43,9 @@ struct MenuView: View {
     func getMenuForPeriod(mealPeriodId: Int) async {
         switch await getFDMealPlannerMenu(locationId: locationId, accountId: accountId, mealPeriodId: mealPeriodId) {
         case .success(let menus):
-            menuItems = parseFDMealPlannerMenu(menu: menus)
+            let parseResults = parseFDMealPlannerMenu(menuRaw: menus)
+            menuItems = parseResults.0
+            conceptToItemsMap = parseResults.1
             isLoading = false
         case .failure(let error):
             print(error)
@@ -110,32 +113,19 @@ struct MenuView: View {
             VStack {
                 if !menuItems.isEmpty {
                     List {
-                        Section {
-                            ForEach(filteredMenuItems) { item in
-                                NavigationLink(destination: MenuItemView(menuItem: item)) {
-                                    VStack(alignment: .leading, spacing: 3) {
-                                        Text(item.name)
-                                        HStack {
-                                            ForEach(item.dietaryMarkers, id: \.self) { dietaryMarker in
-                                                Text(dietaryMarker)
-                                                    .foregroundStyle(Color.white)
-                                                    .font(.caption)
-                                                    .padding(4)
-                                                    .background(
-                                                        RoundedRectangle(cornerRadius: 16)
-                                                            .fill({
-                                                                switch dietaryMarker {
-                                                                case "Vegan", "Vegetarian":
-                                                                    return Color.green
-                                                                default:
-                                                                    return Color.orange
-                                                                }
-                                                            }())
-                                                    )
-                                            }
+                        ForEach(conceptToItemsMap.keys.sorted(), id: \.self) { concept in
+                            let itemsForConcept = filteredMenuItems.filter { item in
+                                conceptToItemsMap[concept, default: []].contains(item.id)
+                            }
+                            
+                            if !itemsForConcept.isEmpty {
+                                Section(
+                                    header: Text(concept)
+                                ) {
+                                    ForEach(itemsForConcept) { item in
+                                        NavigationLink(destination: MenuItemView(menuItem: item)) {
+                                            MenuItemRow(item: item)
                                         }
-                                        Text("\(item.calories) Cal")
-                                            .foregroundStyle(.secondary)
                                     }
                                 }
                             }
@@ -192,6 +182,41 @@ struct MenuView: View {
             .sheet(isPresented: $showingDietaryRestrictionsSheet) {
                 MenuDietaryRestrictionsSheet(dietaryRestrictionsModel: dietaryRestrictionsModel)
             }
+        }
+    }
+}
+
+private struct MenuItemRow: View {
+    let item: FDMenuItem
+    
+    private func badgeColor(for marker: String) -> Color {
+        switch marker {
+        case "Vegan", "Vegetarian":
+            return .green
+        default:
+            return .orange
+        }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(item.name)
+            
+            HStack {
+                ForEach(item.dietaryMarkers, id: \.self) { dietaryMarker in
+                    Text(dietaryMarker)
+                        .foregroundStyle(Color.white)
+                        .font(.caption)
+                        .padding(4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(badgeColor(for: dietaryMarker))
+                        )
+                }
+            }
+            
+            Text("\(item.calories) Cal")
+                .foregroundStyle(.secondary)
         }
     }
 }

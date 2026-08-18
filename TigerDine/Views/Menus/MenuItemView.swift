@@ -155,6 +155,7 @@ struct MenuItemView: View {
             // would've hated implementing the nutrition label without a preview!
             id: 0,
             name: "Bacon, Gouda, & Egg Sandwich",
+            rowId: 1,
             exactName: "Sandwich Bacon Egg Gouda BNZ",
             category: "Breakfast Sandwiches",
             allergens: ["Egg", "Gluten", "Milk", "Soy", "Wheat"],
