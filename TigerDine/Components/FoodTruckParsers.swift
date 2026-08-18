@@ -13,13 +13,11 @@ import SwiftSoup
 // there. This is not a good way to get this data but it's unfortunately the best way that I think
 // I could make it happen. Sorry again for both my later self and anyone else who tries to work on
 // this code.
-func parseWeekendFoodTrucks(htmlString: String) -> [FoodTruckEvent] {
+func parseWeekendFoodTrucks(htmlString: String) -> [Date: [FoodTruckEvent]] {
     do {
         let doc = try SwiftSoup.parse(htmlString)
-        var events: [FoodTruckEvent] = []
-        let now = Date()
-        let calendar = Calendar.current
-        
+        var eventsForDates: [Date: [FoodTruckEvent]] = [:]
+
         let paragraphs = try doc.select("p:has(strong)")
         
         for p in paragraphs {
@@ -27,10 +25,10 @@ func parseWeekendFoodTrucks(htmlString: String) -> [FoodTruckEvent] {
             let parts = text.components(separatedBy: .whitespaces).joined(separator: " ")
             
             let dateRegex = /(?:([A-Za-z]+),\s+[A-Za-z]+\s+\d+)/
-            let date = parts.firstMatch(of: dateRegex).map { String($0.0) } ?? ""
-            if date.isEmpty { continue }
+            guard let dateMatch = parts.firstMatch(of: dateRegex) else { continue }
+            let date = String(dateMatch.0)
             
-            let timeRegex = /(\d{1,2}(:\d{2})?\s*p\.m\.\s*[-–]\s*\d{1,2}(:\d{2})?\s*p\.m\.|\d{1,2}(:\d{2})?\s*[-–]\s*\d{1,2}(:\d{2})?\s*p\.m\.)/
+            let timeRegex = /\d{1,2}(?::\d{2})?\s*(?:[ap]\.?m\.?)?\s*[-–]\s*\d{1,2}(?::\d{2})?\s*[ap]\.?m\.?/
             let time = parts.firstMatch(of: timeRegex).map { String($0.0) } ?? ""
             
             let locationRegex = /[A-Za-z-]+\s+Lot/
@@ -41,48 +39,60 @@ func parseWeekendFoodTrucks(htmlString: String) -> [FoodTruckEvent] {
             let formatter = DateFormatter()
             formatter.dateFormat = "E, MMMM d yyyy"
             formatter.locale = Locale(identifier: "en_US_POSIX")
-            let dateParsed = formatter.date(from: fullDateString) ?? now
+            let dateParsed = formatter.date(from: fullDateString) ?? Date()
             
-            let timeStrings = time.components(separatedBy: CharacterSet(charactersIn: "-–"))
-            print("raw open range: \(timeStrings)")
-            var openTime = Date()
-            var closeTime = Date()
-            
-            if let openString = timeStrings.first?.trimmingCharacters(in: .whitespaces) {
-                let openHourString = openString.filter("0123456789".contains)
-                if !openHourString.isEmpty, let baseHour = Int(openHourString) {
-                    let openHour = openString.contains("a.m") ? baseHour : (baseHour == 12 ? 12 : baseHour + 12)
-                    openTime = calendar.date(bySettingHour: openHour, minute: 0, second: 0, of: dateParsed) ?? now
+            func parseTimeComponent(_ raw: String, defaultPeriod: String, on date: Date) -> Date? {
+                let isAM = raw.contains("a.m")
+                let isPM = raw.contains("p.m")
+                let isAfternoon = isPM || (!isAM && defaultPeriod == "p.m.")
+                
+                let clean = raw.filter(":0123456789".contains)
+                let components = clean.split(separator: ":", maxSplits: 1)
+                
+                guard let hourStr = components.first, var hour = Int(hourStr) else { return nil }
+                let minute = components.count > 1 ? (Int(components[1]) ?? 0) : 0
+                
+                if isAfternoon {
+                    if hour < 12 { hour += 12 }
+                } else {
+                    if hour == 12 { hour = 0 }
                 }
+                
+                return Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: date)
             }
             
-            if let closeString = timeStrings.last?.trimmingCharacters(in: .whitespaces) {
-                let closeClean = closeString.filter(":0123456789".contains)
-                let closeStringComponents = closeClean.split(separator: ":", maxSplits: 1)
-                if let baseHour = Int(closeStringComponents.first ?? "") {
-                    let closeHour = baseHour == 12 ? 12 : baseHour + 12
-                    let closeMinute = closeStringComponents.count > 1 ? (Int(closeStringComponents[1]) ?? 0) : 0
-                    closeTime = calendar.date(bySettingHour: closeHour, minute: closeMinute, second: 0, of: dateParsed) ?? now
-                }
+            let timeStrings = time.components(separatedBy: CharacterSet(charactersIn: "-–"))
+            var openTime = dateParsed
+            var closeTime = dateParsed
+            
+            if let openRaw = timeStrings.first?.trimmingCharacters(in: .whitespaces),
+               let closeRaw = timeStrings.last?.trimmingCharacters(in: .whitespaces) {
+                
+                let closePeriod = closeRaw.contains("a.m") ? "a.m." : "p.m."
+                
+                openTime = parseTimeComponent(openRaw, defaultPeriod: closePeriod, on: dateParsed) ?? dateParsed
+                closeTime = parseTimeComponent(closeRaw, defaultPeriod: "p.m.", on: dateParsed) ?? dateParsed
             }
             
             if let ul = try p.nextElementSibling(), ul.tagName() == "ul" {
                 let trucks = try ul.select("li").array().map { try $0.text() }
                 
-                events.append(FoodTruckEvent(
+                var existingEvents: [FoodTruckEvent] = eventsForDates[dateParsed] ?? []
+                existingEvents.append(FoodTruckEvent(
                     date: dateParsed,
                     openTime: openTime,
                     closeTime: closeTime,
                     location: location,
                     trucks: trucks
                 ))
-                print(events)
+                
+                eventsForDates[dateParsed] = existingEvents
             }
         }
         
-        return events
+        return eventsForDates
     } catch {
         print(error)
-        return []
+        return [:]
     }
 }

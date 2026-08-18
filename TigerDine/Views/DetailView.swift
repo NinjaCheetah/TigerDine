@@ -285,6 +285,7 @@ struct DetailView: View {
                             //.font(.title3)
                     }
                 }
+                
                 // Open this location on the RIT map in embedded Safari.
                 Button(action: {
                     showingSafari = true

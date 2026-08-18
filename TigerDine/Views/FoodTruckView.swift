@@ -9,7 +9,7 @@ import SwiftUI
 import SafariServices
 
 struct FoodTruckView: View {
-    @State private var foodTruckEvents: [FoodTruckEvent] = []
+    @State private var foodTruckEvents: [Date: [FoodTruckEvent]] = [:]
     @State private var isLoading: Bool = true
     @State private var loadFailed: Bool = false
     @State private var showingSafari: Bool = false
@@ -25,6 +25,12 @@ struct FoodTruckView: View {
         }
     }
     
+    private var foodTruckEventsByDay: [[FoodTruckEvent]] {
+        foodTruckEvents
+            .sorted(by: { $0.key < $1.key })
+            .map(\.value)
+    }
+    
     var body: some View {
         if isLoading {
             VStack {
@@ -34,29 +40,40 @@ struct FoodTruckView: View {
                 await doFoodTruckStuff()
             }
         } else {
-            ScrollView {
-                VStack(alignment: .leading) {
-                    Text("Weekend Food Trucks")
-                        .font(.title)
-                        .fontWeight(.semibold)
-                    ForEach(foodTruckEvents, id: \.self) { event in
-                        Divider()
-                        Text(visitingChefDateDisplay.string(from: event.date))
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        Text("\(dateDisplay.string(from: event.openTime)) - \(dateDisplay.string(from: event.closeTime))")
-                            .font(.title3)
-                        ForEach(event.trucks, id: \.self) { truck in
-                            Text(truck)
+            List {
+                ForEach(foodTruckEventsByDay, id: \.self) { day in
+                    Section(
+                        header: Text(visitingChefDateDisplay.string(from: day[0].date))
+                    ) {
+                        ForEach(day, id: \.self) { event in
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading) {
+                                    ForEach(event.trucks, id: \.self) { truck in
+                                        Text(truck)
+                                    }
+                                }
+                                
+                                Spacer()
+                                
+                                Text("\(dateDisplay.string(from: event.openTime)) - \(dateDisplay.string(from: event.closeTime))")
+                                    .foregroundStyle(.secondary)
+                            }
                         }
-                        Spacer()
                     }
-                    Spacer()
-                    Text("Food truck data is sourced directly from the RIT Events website, and may not be presented correctly. Use the globe button in the top right to access the RIT Events website directly to see the original source of the information.")
+                }
+                
+                Section {
+                    Text("Food truck data is sourced directly from the RIT Events website, and " +
+                         "may not always display correctly. Use the globe button in the top " +
+                         "right to access the RIT Events website directly to see the original " +
+                         "source for this information.")
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 }
-                .padding(.horizontal, 16)
+                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 8, trailing: 8))
+                .listRowBackground(Color.clear)
             }
+            .navigationTitle("Weekend Food Trucks")
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
                     Button(action: {

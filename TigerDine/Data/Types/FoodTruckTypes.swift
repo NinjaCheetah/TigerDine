@@ -15,4 +15,3 @@ struct FoodTruckEvent: Hashable {
     let location: String
     let trucks: [String]
 }
-
