@@ -7,19 +7,30 @@
 
 import SwiftUI
 
-// This view handles the actual location list, because having it inside ContentView was too complex (both visually and for the
-// type checker too, apparently).
+// This view handles the actual location list, because having it inside ContentView was too complex
+// (both visually and for the type checker).
 struct LocationList: View {
     @Binding var openLocationsFirst: Bool
     @Binding var openLocationsOnly: Bool
     @Binding var searchText: String
+    var hiddenLocations: Bool
     
     @Environment(DiningModel.self) var model
     
-    // The dining locations need to be sorted before being displayed. Favorites should always be shown first, followed by non-favorites.
-    // Afterwards, filters the sorted list based on any current search text and the "open locations only" filtering option.
+    // The dining locations need to be sorted before being displayed. Favorites should always be
+    // shown first, followed by non-favorites. Afterwards, filters the sorted list based on any
+    // current search text and the "open locations only" filtering option.
     private var filteredLocations: [DiningLocation] {
-        var newLocations = model.locationsByDay[0]
+        let targetLocations = if hiddenLocations {
+            model.locationsByDay[0].filter { location in
+                model.hiddenLocations.contains(location)
+            }
+        } else {
+            model.locationsByDay[0].filter { location in
+                !model.hiddenLocations.contains(location)
+            }
+        }
+        
         // Because "The Commons" should be C for "Commons" and not T for "The".
         func removeThe(_ name: String) -> String {
             let lowercased = name.lowercased()
@@ -28,14 +39,18 @@ struct LocationList: View {
             }
             return name
         }
-        newLocations.sort { firstLoc, secondLoc in
+        
+        return targetLocations.sorted { firstLoc, secondLoc in
             let firstLocIsFavorite = model.favorites.contains(firstLoc)
             let secondLocIsFavorite = model.favorites.contains(secondLoc)
+            
             // Favorites get priority!
             if firstLocIsFavorite != secondLocIsFavorite {
                 return firstLocIsFavorite && !secondLocIsFavorite
             }
-            // Additional sorting rule that sorts open locations ahead of closed locations, if enabled.
+            
+            // Additional sorting rule that sorts open locations ahead of closed locations,
+            // if enabled.
             if openLocationsFirst {
                 let firstIsOpen = (firstLoc.open == .open || firstLoc.open == .closingSoon)
                 let secondIsOpen = (secondLoc.open == .open || secondLoc.open == .closingSoon)
@@ -45,14 +60,12 @@ struct LocationList: View {
             }
             return removeThe(firstLoc.name)
                 .localizedCaseInsensitiveCompare(removeThe(secondLoc.name)) == .orderedAscending
-        }
-        // Search/open only filtering step.
-        newLocations = newLocations.filter { location in
+        }.filter { location in
+            // Search/open only filtering step.
             let searchedLocations = searchText.isEmpty || location.name.localizedCaseInsensitiveContains(searchText)
             let openLocations = !openLocationsOnly || location.open == .open || location.open == .closingSoon
             return searchedLocations && openLocations
         }
-        return newLocations
     }
     
     var body: some View {
@@ -109,6 +122,23 @@ struct LocationList: View {
                     }
                 }
                 .tint(model.favorites.contains(location) ? .yellow : nil)
+                
+                Button(action: {
+                    withAnimation {
+                        if model.hiddenLocations.contains(location) {
+                            model.hiddenLocations.remove(location)
+                        } else {
+                            model.hiddenLocations.add(location)
+                        }
+                    }
+                }) {
+                    if model.hiddenLocations.contains(location) {
+                        Label("Unhide", systemImage: "eye")
+                    } else {
+                        Label("Hide", systemImage: "eye.slash")
+                    }
+                }
+                .tint(model.hiddenLocations.contains(location) ? .blue : nil)
             }
         }
     }

@@ -19,6 +19,7 @@ struct ContentView: View {
     
     @State private var loadFailed: Bool = false
     @State private var showingDonationSheet: Bool = false
+    @State private var hiddenSectionExpanded: Bool = false
     @State private var searchText: String = ""
     @State private var path = NavigationPath()
     
@@ -88,12 +89,14 @@ struct ContentView: View {
                             NavigationLink(destination: VisitingChefsView()) {
                                 Text("Upcoming Visiting Chefs")
                             }
+                            
                             NavigationLink(destination: FoodTruckView()) {
                                 Text("Weekend Food Trucks")
                             }
                         }, header: {
                             Text(fullTextDateDisplay.string(from: model.lastRefreshed!))
                         })
+                        
                         Section(content: {
                             // Prevents crashing if the list is empty. Which shouldn't ever happen,
                             // but still.
@@ -101,7 +104,8 @@ struct ContentView: View {
                                 LocationList(
                                     openLocationsFirst: $openLocationsFirst,
                                     openLocationsOnly: $openLocationsOnly,
-                                    searchText: $searchText
+                                    searchText: $searchText,
+                                    hiddenLocations: false
                                 )
                             }
                         }, footer: {
@@ -112,6 +116,34 @@ struct ContentView: View {
                                         .frame(maxWidth: .infinity)
                                 }
                             }
+                        })
+                        
+                        // This section is just for showing locations that have been hidden.
+                        Section(content: {
+                            if hiddenSectionExpanded {
+                                if !model.locationsByDay.isEmpty {
+                                    LocationList(
+                                        openLocationsFirst: $openLocationsFirst,
+                                        openLocationsOnly: $openLocationsOnly,
+                                        searchText: $searchText,
+                                        hiddenLocations: true
+                                    )
+                                }
+                            }
+                        }, header: {
+                            Button {
+                                withAnimation {
+                                    hiddenSectionExpanded.toggle()
+                                }
+                            } label: {
+                                HStack {
+                                    Text("Hidden Locations")
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .rotationEffect(.degrees(hiddenSectionExpanded ? 90 : 0))
+                                }
+                            }
+                            .buttonStyle(.plain)
                         })
                     }
                     .navigationDestination(for: DiningLocation.self) { location in

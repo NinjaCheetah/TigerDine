@@ -29,8 +29,11 @@ class DiningModel {
     var favorites = Favorites()
     var notifyingChefs = NotifyingChefs()
     var visitingChefPushes = VisitingChefPushesModel()
+    var hiddenLocations = HiddenLocations()
+    
     // Loading state to access in the UI.
     var isLoaded = false
+    
     // Locks
     var pushSchedulerLock = false
     
