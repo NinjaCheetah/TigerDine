@@ -15,6 +15,7 @@ struct DetailView: View {
     @Environment(\.openURL) private var openURL
     
     @State private var showingSafari: Bool = false
+    @State private var showingMenu: Bool = false
     @State private var occupancyLoading: Bool = true
     @State private var occupancyPercentage: Double = 0.0
 
@@ -191,6 +192,46 @@ struct DetailView: View {
                 .listRowBackground(Color.clear)
             }
             
+            Section {
+                HStack {
+                    Button(action: {
+                        showingSafari = true
+                    }) {
+                        VStack(spacing: 4) {
+                            Image(systemName: "map.fill")
+                            Text("Map")
+                                .font(.caption)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    
+                    if location.fdmpIds != nil {
+                        Button(action: {
+                            showingMenu = true
+                        }) {
+                            VStack(spacing: 4) {
+                                Image(systemName: "menucard.fill")
+                                Text("Menu")
+                                    .font(.caption)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.roundedRectangle(radius: 16))
+                .tint(Color.accentColor)
+                .fontWeight(.semibold)
+                .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 8, trailing: 8))
+                .listRowBackground(Color.clear)
+            }
+            .listSectionSpacing(.custom(4))
+            .navigationDestination(isPresented: $showingMenu) {
+                if let fdmpIds = location.fdmpIds {
+                    MenuView(accountId: fdmpIds.accountId, locationId: fdmpIds.locationId)
+                }
+            }
+            
             if let visitingChefs = location.visitingChefs, !visitingChefs.isEmpty {
                 Section(
                     header: Text("Today's Visiting Chefs")
@@ -287,17 +328,17 @@ struct DetailView: View {
                 }
                 
                 // Open this location on the RIT map in embedded Safari.
-                Button(action: {
-                    showingSafari = true
-                }) {
-                    Image(systemName: "map")
-                        //.font(.title3)
-                }
-                if let fdmpIds = location.fdmpIds {
-                    NavigationLink(destination: MenuView(accountId: fdmpIds.accountId, locationId: fdmpIds.locationId)) {
-                        Image(systemName: "menucard")
-                    }
-                }
+//                Button(action: {
+//                    showingSafari = true
+//                }) {
+//                    Image(systemName: "map")
+//                        //.font(.title3)
+//                }
+//                if let fdmpIds = location.fdmpIds {
+//                    NavigationLink(destination: MenuView(accountId: fdmpIds.accountId, locationId: fdmpIds.locationId)) {
+//                        Image(systemName: "menucard")
+//                    }
+//                }
             }
         }
         .contentMargins(.top, 0)

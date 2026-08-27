@@ -108,14 +108,6 @@ struct ContentView: View {
                                     hiddenLocations: false
                                 )
                             }
-                        }, footer: {
-                            if let lastRefreshed = model.lastRefreshed {
-                                VStack(alignment: .center) {
-                                    Text("Last refreshed: \(lastRefreshed.formatted())")
-                                        .foregroundStyle(.secondary)
-                                        .frame(maxWidth: .infinity)
-                                }
-                            }
                         })
                         
                         // This section is just for showing locations that have been hidden.
@@ -144,6 +136,14 @@ struct ContentView: View {
                                 }
                             }
                             .buttonStyle(.plain)
+                        }, footer: {
+                            if let lastRefreshed = model.lastRefreshed {
+                                VStack(alignment: .center) {
+                                    Text("Last refreshed: \(lastRefreshed.formatted())")
+                                        .foregroundStyle(.secondary)
+                                        .frame(maxWidth: .infinity)
+                                }
+                            }
                         })
                     }
                     .navigationDestination(for: DiningLocation.self) { location in
