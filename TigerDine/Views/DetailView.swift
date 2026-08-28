@@ -239,7 +239,9 @@ struct DetailView: View {
                     ForEach(visitingChefs, id: \.self) { chef in
                         HStack(alignment: .top) {
                             Text(chef.name)
+                            
                             Spacer()
+                            
                             VStack(alignment: .trailing) {
                                 switch chef.status {
                                 case .hereNow:
@@ -273,7 +275,9 @@ struct DetailView: View {
                     ForEach(dailySpecials, id: \.self) { special in
                         HStack(alignment: .top) {
                             Text(special.name)
+                            
                             Spacer()
+                            
                             Text(special.type)
                                 .foregroundStyle(.secondary)
                         }

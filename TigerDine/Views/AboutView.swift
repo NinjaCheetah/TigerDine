@@ -84,7 +84,7 @@ struct AboutView: View {
                 EmptyView()
             }
         }
-        .contentMargins(.top, 0)
+        .contentMargins(.top, 8)
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
     }

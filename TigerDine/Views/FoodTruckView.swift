@@ -46,6 +46,8 @@ struct FoodTruckView: View {
                         header: Text(visitingChefDateDisplay.string(from: day[0].date))
                     ) {
                         ForEach(day, id: \.self) { event in
+                            let calendar = Calendar.current
+                            
                             HStack(alignment: .top) {
                                 VStack(alignment: .leading) {
                                     ForEach(event.trucks, id: \.self) { truck in
@@ -58,6 +60,8 @@ struct FoodTruckView: View {
                                 Text("\(dateDisplay.string(from: event.openTime)) - \(dateDisplay.string(from: event.closeTime))")
                                     .foregroundStyle(.secondary)
                             }
+                            .opacity(calendar.component(.day, from: day[0].date)
+                                     < calendar.component(.day, from: .now) ? 0.3 : 1.0)
                         }
                     }
                 }

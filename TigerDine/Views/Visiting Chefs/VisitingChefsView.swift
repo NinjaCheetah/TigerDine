@@ -15,10 +15,14 @@ struct IdentifiableURL: Identifiable {
 struct VisitingChefsView: View {
     @Environment(DiningModel.self) var model
     
+    // Load this key so we can not do the potentially undesirable animation of flicking through
+    // all of the days when you choose a day from the picker if the user has reduce motion on.
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    
     @State private var locationsWithChefs: [DiningLocation] = []
     @State private var safariUrl: IdentifiableURL?
     @State private var chefDays: [String] = []
-    @State private var focusedIndex: Int = 0
+    @State private var focusedIndex: Int? = 0
     
     // Builds a list of days that each contain a list of dining locations that have visiting chefs
     // to make displaying them as easy as possible.
@@ -37,103 +41,109 @@ struct VisitingChefsView: View {
     }
     
     var body: some View {
-        TabView(selection: $focusedIndex) {
-            ForEach(0..<7, id: \.self) { index in
-                List {
-                    if locationsWithChefsByDay[index].isEmpty {
-                        Section {
-                            VStack {
-                                Spacer()
-                                
-                                Image(systemName: "clock.badge.exclamationmark")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 75, height: 75)
-                                    .foregroundStyle(.accent)
-                                
-                                Text("No visiting chefs today.")
-                                    .foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.center)
-                            }
-                            .padding(.top, 16)
-                            .frame(maxWidth: .infinity)
-                            .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
-                            .listRowBackground(Color.clear)
-                        }
-                    } else {
-                        ForEach(
-                            locationsWithChefsByDay[index], id: \.self) { location in
-                            if let visitingChefs = location.visitingChefs, !visitingChefs.isEmpty {
-                                Section(
-                                    header:
-                                        HStack(alignment: .center) {
-                                            Text(location.name)
-                                            
-                                            Spacer()
-                                            
-                                            Button {
-                                                safariUrl = IdentifiableURL(
-                                                    url: URL(string: location.mapsUrl)!
-                                                )
-                                            } label: {
-                                                Image(systemName: "map")
-                                                    .foregroundStyle(.accent)
-                                            }
-                                        }
-                                ) {
-                                    ForEach(visitingChefs, id: \.self) { chef in
-                                        VStack(alignment: .leading) {
-                                            Text(chef.name)
-                                                .fontWeight(.semibold)
-                                            
-                                            if index == 0 {
-                                                switch chef.status {
-                                                case .hereNow:
-                                                    Text("Here Now")
-                                                        .foregroundStyle(.green)
-                                                case .gone:
-                                                    Text("Left For Today")
-                                                        .foregroundStyle(.red)
-                                                case .arrivingLater:
-                                                    Text("Arriving Later")
-                                                        .foregroundStyle(.red)
-                                                case .arrivingSoon:
-                                                    Text("Arriving Soon")
-                                                        .foregroundStyle(.orange)
-                                                case .leavingSoon:
-                                                    Text("Leaving Soon")
-                                                        .foregroundStyle(.orange)
-                                                }
-                                            } else {
-                                                Text(
-                                                    "Arriving on \(weekdayFromDate.string(from: model.daysRepresented[index]))"
-                                                )
-                                                .foregroundStyle(.red)
-                                            }
-                                            
-                                            Text(
-                                                "\(dateDisplay.string(from: chef.openTime)) - \(dateDisplay.string(from: chef.closeTime))"
-                                            )
+        VStack(spacing: 0) {
+            header
+                .padding(.vertical, 8)
+                .background(.background)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 0) {
+                    ForEach(0..<7, id: \.self) { index in
+                        List {
+                            if locationsWithChefsByDay[index].isEmpty {
+                                Section {
+                                    VStack {
+                                        Spacer()
+                                        
+                                        Image(systemName: "clock.badge.exclamationmark")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 75, height: 75)
+                                            .foregroundStyle(.accent)
+                                        
+                                        Text("No visiting chefs today.")
                                             .foregroundStyle(.secondary)
+                                            .multilineTextAlignment(.center)
+                                    }
+                                    .padding(.top, 16)
+                                    .frame(maxWidth: .infinity)
+                                    .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+                                    .listRowBackground(Color.clear)
+                                }
+                            } else {
+                                ForEach(
+                                    locationsWithChefsByDay[index], id: \.self) { location in
+                                    if let visitingChefs = location.visitingChefs, !visitingChefs.isEmpty {
+                                        Section(
+                                            header:
+                                                HStack(alignment: .center) {
+                                                    Text(location.name)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Button {
+                                                        safariUrl = IdentifiableURL(
+                                                            url: URL(string: location.mapsUrl)!
+                                                        )
+                                                    } label: {
+                                                        Image(systemName: "map")
+                                                            .foregroundStyle(.accent)
+                                                    }
+                                                }
+                                        ) {
+                                            ForEach(visitingChefs, id: \.self) { chef in
+                                                VStack(alignment: .leading) {
+                                                    Text(chef.name)
+                                                        .fontWeight(.semibold)
+                                                    
+                                                    if index == 0 {
+                                                        switch chef.status {
+                                                        case .hereNow:
+                                                            Text("Here Now")
+                                                                .foregroundStyle(.green)
+                                                        case .gone:
+                                                            Text("Left For Today")
+                                                                .foregroundStyle(.red)
+                                                        case .arrivingLater:
+                                                            Text("Arriving Later")
+                                                                .foregroundStyle(.red)
+                                                        case .arrivingSoon:
+                                                            Text("Arriving Soon")
+                                                                .foregroundStyle(.orange)
+                                                        case .leavingSoon:
+                                                            Text("Leaving Soon")
+                                                                .foregroundStyle(.orange)
+                                                        }
+                                                    } else {
+                                                        Text(
+                                                            "Arriving on \(weekdayFromDate.string(from: model.daysRepresented[index]))"
+                                                        )
+                                                        .foregroundStyle(.red)
+                                                    }
+                                                    
+                                                    Text(
+                                                        "\(dateDisplay.string(from: chef.openTime)) - \(dateDisplay.string(from: chef.closeTime))"
+                                                    )
+                                                    .foregroundStyle(.secondary)
 
-                                            Text(chef.description)
-                                                .foregroundStyle(.secondary)
+                                                    Text(chef.description)
+                                                        .foregroundStyle(.secondary)
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                        .containerRelativeFrame(.horizontal)
+                        .id(index)
                     }
                 }
-                .tag(index)
+                .scrollTargetLayout()
             }
-        }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        .background(Color(.systemGroupedBackground))
-        .safeAreaInset(edge: .top, spacing: 0) {
-            header
-                .padding(.vertical, 8)
-                .background(.background)
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: $focusedIndex)
+            .background(Color(.systemGroupedBackground))
         }
         .refreshable {
             do {
@@ -150,21 +160,23 @@ struct VisitingChefsView: View {
     }
     
     private var header: some View {
-        VStack(spacing: 8) {
+        let currentIndex = focusedIndex ?? 0
+        
+        return VStack(spacing: 8) {
             HStack(alignment: .center) {
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        focusedIndex -= 1
+                    withAnimation(reduceMotion ? .none : .easeInOut(duration: 0.25)) {
+                        focusedIndex = max(0, currentIndex - 1)
                     }
                 }) {
                     Image(systemName: "chevron.left")
                         .font(.title)
                 }
-                .disabled(focusedIndex == 0)
+                .disabled(currentIndex == 0)
                 
                 Spacer()
                 
-                Text(visitingChefDateDisplay.string(from: model.daysRepresented[focusedIndex]))
+                Text(visitingChefDateDisplay.string(from: model.daysRepresented[focusedIndex!]))
                     .font(.title)
                     .multilineTextAlignment(.center)
                     // Makes this text NOT animate when you tap a day's button.
@@ -173,21 +185,21 @@ struct VisitingChefsView: View {
                 Spacer()
                 
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        focusedIndex += 1
+                    withAnimation(reduceMotion ? .none : .easeInOut(duration: 0.25)) {
+                        focusedIndex = min(6, currentIndex + 1)
                     }
                 }) {
                     Image(systemName: "chevron.right")
                         .font(.title)
                 }
-                .disabled(focusedIndex == 6)
+                .disabled(currentIndex == 6)
             }
             .padding(.horizontal)
             
             Picker("Day", selection: Binding(
-                get: { focusedIndex },
+                get: { focusedIndex! },
                 set: { newValue in
-                    withAnimation(.easeInOut(duration: 0.25)) {
+                    withAnimation(reduceMotion ? .none : .easeInOut(duration: 0.25)) {
                         focusedIndex = newValue
                     }
                 }
