@@ -84,48 +84,51 @@ struct VisitingChefsPushView: View {
                     }
                 }
                 .disabled(!pushAllowed || !pushEnabled)
-                #if DEBUG
-                Section(header: Text("DEBUG - Scheduled Pushes")) {
-                    Button(action: {
-                        Task {
-                            await model.scheduleAllPushes()
-                        }
-                    }) {
-                        Text("Schedule All")
-                    }
-                    Button(action: {
-                        let uuids = model.visitingChefPushes.pushes.map(\.uuid)
-                        Task {
-                            await cancelVisitingChefNotifs(uuids: uuids)
-                            model.visitingChefPushes.pushes.removeAll()
-                        }
-                    }) {
-                        Text("Cancel All")
-                    }
-                    .tint(.red)
-                    ForEach(model.visitingChefPushes.pushes, id: \.uuid) { push in
-                        VStack(alignment: .leading) {
-                            Text("\(push.name) at \(push.location)")
-                            Text(push.uuid)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text("\(push.startTime) - \(push.endTime)")
-                                .foregroundStyle(.secondary)
-                        }
-                        .swipeActions {
-                            Button(action: {
-                                Task {
-                                    await cancelVisitingChefNotifs(uuids: [push.uuid])
-                                    model.visitingChefPushes.pushes.remove(at: model.visitingChefPushes.pushes.firstIndex(of: push)!)
-                                }
-                            }) {
-                                Label("Delete", systemImage: "trash")
-                            }
-                            .tint(.red)
-                        }
-                    }
-                }
-                #endif
+                // The debug menu is now commented out because pushes have been working fine and I
+                // don't think that I need it anymore. I also encapsulated PushesModel better so
+                // a lot of the code used here doesn't work anymore anyway.
+//                #if DEBUG
+//                Section(header: Text("DEBUG - Scheduled Pushes")) {
+//                    Button(action: {
+//                        Task {
+//                            await model.scheduleAllPushes()
+//                        }
+//                    }) {
+//                        Text("Schedule All")
+//                    }
+//                    Button(action: {
+//                        let uuids = model.visitingChefPushes.pushes.map(\.uuid)
+//                        Task {
+//                            await cancelVisitingChefNotifs(uuids: uuids)
+//                            model.visitingChefPushes.pushes.removeAll()
+//                        }
+//                    }) {
+//                        Text("Cancel All")
+//                    }
+//                    .tint(.red)
+//                    ForEach(model.visitingChefPushes.pushes, id: \.uuid) { push in
+//                        VStack(alignment: .leading) {
+//                            Text("\(push.name) at \(push.location)")
+//                            Text(push.uuid)
+//                                .font(.caption)
+//                                .foregroundStyle(.secondary)
+//                            Text("\(push.startTime) - \(push.endTime)")
+//                                .foregroundStyle(.secondary)
+//                        }
+//                        .swipeActions {
+//                            Button(action: {
+//                                Task {
+//                                    await cancelVisitingChefNotifs(uuids: [push.uuid])
+//                                    model.visitingChefPushes.pushes.remove(at: model.visitingChefPushes.pushes.firstIndex(of: push)!)
+//                                }
+//                            }) {
+//                                Label("Delete", systemImage: "trash")
+//                            }
+//                            .tint(.red)
+//                        }
+//                    }
+//                }
+//                #endif
             }
         }
         .onAppear {

@@ -13,8 +13,7 @@ struct MenuView: View {
     @State private var menuItems: [FDMenuItem] = []
     @State private var conceptToItemsMap: [String: [Int]] = [:]
     @State private var searchText: String = ""
-    @State private var isLoading: Bool = true
-    @State private var loadFailed: Bool = false
+    @State private var loadingState: LoadingState = .loading
     @State private var selectedMealPeriod: Int = 0
     @State private var openPeriods: [Int] = []
     @StateObject private var dietaryRestrictionsModel = MenuDietaryRestrictionsModel()
@@ -35,7 +34,7 @@ struct MenuView: View {
                 await getMenuForPeriod(mealPeriodId: selectedMealPeriod)
             case .failure(let error):
                 print(error)
-                loadFailed = true
+                loadingState = .failed
             }
         }
     }
@@ -46,10 +45,10 @@ struct MenuView: View {
             let parseResults = parseFDMealPlannerMenu(menuRaw: menus)
             menuItems = parseResults.0
             conceptToItemsMap = parseResults.1
-            isLoading = false
+            loadingState = .loaded
         case .failure(let error):
             print(error)
-            loadFailed = true
+            loadingState = .failed
         }
     }
     
@@ -102,9 +101,9 @@ struct MenuView: View {
     }
     
     var body: some View {
-        if isLoading {
+        if loadingState != .loaded {
             VStack {
-                LoadingView(loadFailed: $loadFailed)
+                LoadingView(state: loadingState)
             }
             .task {
                 await getOpenPeriods()
@@ -174,7 +173,7 @@ struct MenuView: View {
                 }
             }
             .onChange(of: selectedMealPeriod) {
-                isLoading = true
+                loadingState = .loading
                 Task {
                     await getMenuForPeriod(mealPeriodId: selectedMealPeriod)
                 }

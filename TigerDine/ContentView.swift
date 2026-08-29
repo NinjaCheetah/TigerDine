@@ -17,54 +17,26 @@ struct ContentView: View {
     @Binding var targetLocationId: Int?
     @Binding var handledLocationId: Int?
     
-    @State private var loadFailed: Bool = false
     @State private var showingDonationSheet: Bool = false
     @State private var hiddenSectionExpanded: Bool = false
     @State private var searchText: String = ""
     @State private var path = NavigationPath()
     
-    // Small wrapper around the method on the model so that errors can be handled by showing the
-    // uh error screen.
-    private func getDiningData(bustCache: Bool = false) async {
-        do {
-            if bustCache {
-                try await model.getHoursByDay()
-            }
-            else {
-                try await model.getHoursByDayCached()
-            }
-        } catch {
-            loadFailed = true
-        }
-    }
-    
-    // Start a perpetually running timer to refresh the open statuses, so that they automatically
-    // switch as appropriate without needing to refresh the data. You don't need to yell at the API
-    // again to know that the location opening at 11:00 AM should now display "Open" instead of
-    // "Opening Soon" now that it's 11:01.
-    private func updateOpenStatuses() async {
-        Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
-            model.updateOpenStatuses()
-            // If the last refreshed date isn't today, that means we probably passed midnight and
-            // need to refresh the data. So do that.
-            if !Calendar.current.isDateInToday(model.lastRefreshed ?? Date()) {
-                Task {
-                    await getDiningData()
-                }
-            }
-        }
-    }
-    
+    // This function still sucks and loves to not work, I really gotta fix it eventually. Its
+    // purpose is to handle the links given to the app by the widgets, so when you tap on a widget
+    // for a given location the app opens to the details for that location.
     private func handleOpenDeepLink() {
         guard
-            model.isLoaded,
+            model.loadingState == .loaded,
             let targetLocationId,
             handledLocationId != targetLocationId,
             !model.locationsByDay.isEmpty,
             let location = model.locationsByDay[0].first(where: { $0.id == targetLocationId })
             else { return }
+        
         handledLocationId = targetLocationId
         print("TigerDine opened to \(location.name)")
+        
         // Reset the path back to the root (which is here, ContentView).
         path = NavigationPath()
         // Do this in an async block because apparently SwiftUI won't handle these two
@@ -78,9 +50,9 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
-            if !model.isLoaded {
+            if model.loadingState != .loaded {
                 VStack {
-                    LoadingView(loadFailed: $loadFailed)
+                    LoadingView(state: model.loadingState)
                 }
             } else {
                 VStack() {
@@ -152,24 +124,24 @@ struct ContentView: View {
                     .onChange(of: targetLocationId) {
                         handleOpenDeepLink()
                     }
-                    .onChange(of: model.isLoaded) {
+                    .onChange(of: model.loadingState) {
                         handleOpenDeepLink()
                     }
                 }
                 .navigationTitle("TigerDine")
                 .searchable(text: $searchText, prompt: "Search")
                 .refreshable {
-                    await getDiningData(bustCache: true)
+                    await model.getDiningData(cached: false)
                 }
                 .toolbar {
                     ToolbarItemGroup(placement: .primaryAction) {
                         NavigationLink(destination: VisitingChefsPushView()) {
-                            Image(systemName: "bell.badge")
+                            Image(systemName: "bell")
                         }
                         Menu {
                             Button(action: {
                                 Task {
-                                    await getDiningData(bustCache: true)
+                                    await model.getDiningData(cached: false)
                                 }
                             }) {
                                 Label("Refresh", systemImage: "arrow.clockwise")
@@ -224,10 +196,6 @@ struct ContentView: View {
                     }
                 }
             }
-        }
-        .task {
-            await getDiningData()
-            await updateOpenStatuses()
         }
         .sheet(isPresented: $showingDonationSheet) {
             DonationView()

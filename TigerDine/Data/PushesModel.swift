@@ -9,7 +9,7 @@ import SwiftUI
 
 @Observable
 class VisitingChefPushesModel {
-    var pushes: [ScheduledVistingChefPush] = [] {
+    private var pushes: [ScheduledVistingChefPush] = [] {
         didSet {
             save()
         }
@@ -60,14 +60,46 @@ class VisitingChefPushesModel {
         save()
     }
     
+    /// Cancels all pending push notifications. Used when disabling push notifications as a whole.
+    func cancelAllPushes() async {
+        let uuids = pushes.map(\.uuid)
+        await cancelVisitingChefNotifs(uuids: uuids)
+        pushes.removeAll()
+    }
+    
     /// Checks if a push notification meeting the specified criteria is already scheduled.
     func pushAlreadyRegisered(name: String, location: String, startTime: Date, endTime: Date) -> Bool {
         for push in pushes {
-            if push.name == name && push.location == location && push.startTime == startTime && push.endTime == endTime {
+            if push.name == name
+                && push.location == location
+                && push.startTime == startTime
+                && push.endTime == endTime
+            {
                 return true
             }
         }
         return false
+    }
+    
+    /// Cleans up old push notifications that have already been delivered so that we're not still
+    /// tracking them forever.
+    func cleanupPushes() async {
+        let now = Date()
+        
+        for push in pushes {
+            if now > push.endTime {
+                // Guard this with an if let to avoid force unwrapping the index. That's something
+                // that theoretically should always be safe given that this is iterating over
+                // elements so obviously that element should exist,  however there was an issue
+                // where this would sometimes unwrap a nil. My theory is that there was a small
+                // chance of this task getting run twice concurrently under certain conditions, and
+                // so one would remove the notification right before the other tried, and then it
+                // would be gone and the index would be nil.
+                if let pushIndex = pushes.firstIndex(of: push) {
+                    pushes.remove(at: pushIndex)
+                }
+            }
+        }
     }
 
     /// Write out the registered push notifications.

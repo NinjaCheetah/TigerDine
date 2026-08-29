@@ -116,23 +116,24 @@ struct DetailView: View {
     }
     
     // Still a little broken, does not work for refresh. Need to fix.
-    private func getOccupancy() async {
-        // Only fetch occupancy data if the location is actually open right now. Otherwise, just
-        // exit early and hide the spinner.
-        if location.open == .open || location.open == .closingSoon {
-            occupancyLoading = true
-            switch await getOccupancyPercentage(mdoId: location.mdoId) {
-            case .success(let occupancy):
-                occupancyPercentage = occupancy
-                occupancyLoading = false
-            case .failure(let error):
-                print(error)
-                occupancyLoading = false
-            }
-        } else {
-            occupancyLoading = false
-        }
-    }
+    // Will un-comment if the occupancy API is ever brought back from the dead.
+//    private func getOccupancy() async {
+//        // Only fetch occupancy data if the location is actually open right now. Otherwise, just
+//        // exit early and hide the spinner.
+//        if location.open == .open || location.open == .closingSoon {
+//            occupancyLoading = true
+//            switch await getOccupancyPercentage(mdoId: location.mdoId) {
+//            case .success(let occupancy):
+//                occupancyPercentage = occupancy
+//                occupancyLoading = false
+//            case .failure(let error):
+//                print(error)
+//                occupancyLoading = false
+//            }
+//        } else {
+//            occupancyLoading = false
+//        }
+//    }
     
     var body: some View {
         List {
@@ -141,10 +142,12 @@ struct DetailView: View {
                     Text(location.name)
                         .font(.title)
                         .fontWeight(.bold)
+                    
                     Text(location.summary)
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundStyle(.secondary)
+                    
                     VStack(alignment: .leading) {
                         switch location.open {
                         case .open:
@@ -164,10 +167,11 @@ struct DetailView: View {
                                 .font(.title3)
                                 .foregroundStyle(.orange)
                         }
+                        
                         Text(upNextString)
                             .foregroundStyle(.secondary)
                     }
-//                    #if DEBUG
+                    // Another case of un-comment if the occupancy API is available again.
 //                    HStack(spacing: 0) {
 //                        ForEach(Range(1...5), id: \.self) { index in
 //                            if occupancyPercentage > (20 * Double(index)) {
@@ -186,7 +190,6 @@ struct DetailView: View {
 //                    }
 //                    .foregroundStyle(Color.accent.opacity(occupancyLoading ? 0.5 : 1.0))
 //                    .font(.title3)
-//                    #endif
                 }
                 .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 8, trailing: 8))
                 .listRowBackground(Color.clear)
@@ -330,19 +333,6 @@ struct DetailView: View {
                             //.font(.title3)
                     }
                 }
-                
-                // Open this location on the RIT map in embedded Safari.
-//                Button(action: {
-//                    showingSafari = true
-//                }) {
-//                    Image(systemName: "map")
-//                        //.font(.title3)
-//                }
-//                if let fdmpIds = location.fdmpIds {
-//                    NavigationLink(destination: MenuView(accountId: fdmpIds.accountId, locationId: fdmpIds.locationId)) {
-//                        Image(systemName: "menucard")
-//                    }
-//                }
             }
         }
         .contentMargins(.top, 0)
@@ -357,7 +347,8 @@ struct DetailView: View {
             } catch {
                 print(error)
             }
-            await getOccupancy()
+            // Uncomment if occupancy API comes back to re-enable the feature.
+            //await getOccupancy()
         }
     }
 }

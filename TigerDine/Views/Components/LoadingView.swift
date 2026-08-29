@@ -13,7 +13,7 @@ enum LoadingType {
 }
 
 struct LoadingView: View {
-    @Binding var loadFailed: Bool
+    var state: LoadingState
     @State var loadingType: LoadingType = .normal
     
     @State private var rotationDegrees: Double = 0
@@ -43,15 +43,8 @@ struct LoadingView: View {
     
     var body: some View {
         VStack {
-            if loadFailed {
-                Image(systemName: "wifi.exclamationmark.circle")
-                    .resizable()
-                    .frame(width: 75, height: 75)
-                    .foregroundStyle(.accent)
-                Text("An error occurred while loading data. Please check your network connection and try again.")
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            } else {
+            switch state {
+            case .loading:
                 Image(systemName: loadingSymbol)
                     .resizable()
                     .scaledToFit()
@@ -68,6 +61,16 @@ struct LoadingView: View {
                     .onAppear {
                         loadingText = loadingTextOptions.randomElement() ?? ""
                     }
+            case .failed:
+                Image(systemName: "wifi.exclamationmark.circle")
+                    .resizable()
+                    .frame(width: 75, height: 75)
+                    .foregroundStyle(.accent)
+                Text("An error occurred while loading data. Please check your network connection and try again.")
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            default:
+                EmptyView()
             }
         }
         .padding()

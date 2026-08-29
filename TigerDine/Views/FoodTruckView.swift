@@ -10,18 +10,17 @@ import SafariServices
 
 struct FoodTruckView: View {
     @State private var foodTruckEvents: [Date: [FoodTruckEvent]] = [:]
-    @State private var isLoading: Bool = true
-    @State private var loadFailed: Bool = false
+    @State private var loadingState: LoadingState = .loading
     @State private var showingSafari: Bool = false
     
     private func doFoodTruckStuff() async {
         switch await getFoodTruckPage() {
         case .success(let schedule):
             foodTruckEvents = parseWeekendFoodTrucks(htmlString: schedule)
-            isLoading = false
+            loadingState = .loaded
         case .failure(let error):
             print(error)
-            loadFailed = true
+            loadingState = .failed
         }
     }
     
@@ -32,9 +31,9 @@ struct FoodTruckView: View {
     }
     
     var body: some View {
-        if isLoading {
+        if loadingState != .loaded {
             VStack {
-                LoadingView(loadFailed: $loadFailed, loadingType: .truck)
+                LoadingView(state: loadingState, loadingType: .truck)
             }
             .task {
                 await doFoodTruckStuff()

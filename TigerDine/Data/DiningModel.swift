@@ -9,6 +9,7 @@ import SwiftUI
 import WidgetKit
 
 @Observable
+@MainActor
 class DiningModel {
     var locationsByDay = [[DiningLocation]]()
     var daysRepresented = [Date]()
@@ -24,17 +25,18 @@ class DiningModel {
             sharedDefaults?.set(newValue?.timeIntervalSince1970, forKey: "lastRefreshed")
         }
     }
+    private var statusTimerTask: Task<Void, Never>?
     
-    // External models that should be nested under this one.
+    // External state that should be nested under this model.
     var favorites = Favorites()
     var notifyingChefs = NotifyingChefs()
     var visitingChefPushes = VisitingChefPushesModel()
     var hiddenLocations = HiddenLocations()
     
     // Loading state to access in the UI.
-    var isLoaded = false
+    var loadingState: LoadingState = .loading
     
-    // Locks
+    // Locks (which might be a sign I'm doing something wrong?)
     var pushSchedulerLock = false
     
     func getDaysRepresented() async {
@@ -44,6 +46,55 @@ class DiningModel {
             calendar.date(byAdding: .day, value: offset, to: today)
         }
         daysRepresented = week
+    }
+    
+    /// Triggers the initial data load and sets up the timer to update the open statuses and
+    /// reload past midnight. This finally unties it from ContentView!
+    init() {
+        Task { await getDiningData(cached: true) }
+        startStatusTimer()
+    }
+    
+    /// Start the perpetually running open status update code to automatically update open statuses
+    /// as time progresses.
+    func startStatusTimer() {
+        guard statusTimerTask == nil else { return }
+
+        statusTimerTask = Task {
+            while !Task.isCancelled {
+                updateOpenStatuses()
+
+                if !Calendar.current.isDateInToday(lastRefreshed ?? Date()) {
+                    await getDiningData(cached: false)
+                }
+
+                do {
+                    try await Task.sleep(for: .seconds(2))
+                } catch {
+                    break
+                }
+            }
+        }
+    }
+    
+    /// I don't currently have a use for this but it's good to be able to stop things you start
+    /// I think.
+    func stopStatusTimer() {
+        statusTimerTask?.cancel()
+        statusTimerTask = nil
+    }
+    
+    /// Safe method to call to load dining data to keep error handling inside of the model.
+    func getDiningData(cached: Bool) async {
+        do {
+            if cached {
+                try await getHoursByDayCached()
+            } else {
+                try await getHoursByDay()
+            }
+        } catch {
+            loadingState = .failed
+        }
     }
     
     /// This is the actual method responsible for making requests to the API for the current day
@@ -94,11 +145,11 @@ class DiningModel {
         scheduleNextRefresh()
         
         // And finally set the loaded state to true.
-        isLoaded = true
+        loadingState = .loaded
     }
     
     /// Wrapper function for the real getHoursByDay() that checks the last refreshed stamp and uses
-    ///  cached data if it's fresh or triggers a refresh if it's stale.
+    /// cached data if it's fresh or triggers a refresh if it's stale.
     func getHoursByDayCached() async throws {
         let now = Date()
         // If we can't access the lastRefreshed key, then there is likely no cache.
@@ -126,9 +177,9 @@ class DiningModel {
                         // any new notifications to schedule since the last real data refresh.
                         locationsByDay = cachedLocationsByDay
                         updateOpenStatuses()
-                        await cleanupPushes()
+                        await visitingChefPushes.cleanupPushes()
                         
-                        isLoaded = true
+                        loadingState = .loaded
                         return
                     } else {
                         print("cache exists, but failed to load JSON data")
@@ -159,6 +210,7 @@ class DiningModel {
     func scheduleAllPushes() async {
         guard !pushSchedulerLock else { return }
         pushSchedulerLock = true
+        
         for day in locationsByDay {
             for location in day {
                 if let visitingChefs = location.visitingChefs {
@@ -176,35 +228,13 @@ class DiningModel {
             }
         }
         // Run a cleanup task once we're done scheduling.
-        await cleanupPushes()
+        await visitingChefPushes.cleanupPushes()
         pushSchedulerLock = false
     }
     
-    /// Cleans up old push notifications that have already been delivered so that we're not still
-    /// tracking them forever.
-    func cleanupPushes() async {
-        let now = Date()
-        for push in visitingChefPushes.pushes {
-            if now > push.endTime {
-                // Guard this with an if let to avoid force unwrapping the index. That's something
-                // that theoretically should always be safe given that this is iterating over
-                // elements so obviously that element should exist,  however there was an issue
-                // where this would sometimes unwrap a nil. My theory is that there was a small
-                // chance of this task getting run twice concurrently under certain conditions, and
-                // so one would remove the notification right before the other tried, and then it
-                // would be gone and the index would be nil.
-                if let pushIndex = visitingChefPushes.pushes.firstIndex(of: push) {
-                    visitingChefPushes.pushes.remove(at: pushIndex)
-                }
-            }
-        }
-    }
-    
-    /// Cancels all pending push notifications. Used when disabling push notifications as a whole.
+    /// Cancels all pushes. This is on the PushesModel to handle itself now.
     func cancelAllPushes() async {
-        let uuids = visitingChefPushes.pushes.map(\.uuid)
-        await cancelVisitingChefNotifs(uuids: uuids)
-        visitingChefPushes.pushes.removeAll()
+        await visitingChefPushes.cancelAllPushes()
     }
     
     /// Schedules and saves push notifications for a specific visiting chef.
