@@ -15,10 +15,10 @@ enum InvalidHTTPError: Error {
 // callback based code in a context where callback based code made no sense. I love async!
 // Get information for all dining locations.
 func getAllDiningInfo(date: Date?) async -> Result<DiningLocationsParser, Error> {
-    // The endpoint requires that you specify a date, so get today's.
+    // The endpoint requires that you specify a date, so get today's if we don't have one.
     let dateString: String = getTCAPIFriendlyDateString(date: date ?? Date())
-    let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=\(dateString)"
 //    let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=2026-04-24"
+    let urlString = "http://tigerdine.ninjacheetah.dev/api/dining/dining-all?date=\(dateString)"
     
     guard let url = URL(string: urlString) else {
         return .failure(URLError(.badURL))
@@ -26,6 +26,26 @@ func getAllDiningInfo(date: Date?) async -> Result<DiningLocationsParser, Error>
 
     do {
         let (data, response) = try await URLSession.shared.data(from: url)
+        
+        if let httpResponse = response as? HTTPURLResponse,
+              !(200...299).contains(httpResponse.statusCode) {
+            print("supplemental API request failed, will try TigerCenter directly")
+        }
+        
+        let decoded = try JSONDecoder().decode(DiningLocationsParser.self, from: data)
+        return .success(decoded)
+    } catch {
+        print("supplemental API request failed, will try TigerCenter directly")
+    }
+    
+    let tcUrlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=\(dateString)"
+    
+    guard let tcUrl = URL(string: tcUrlString) else {
+        return .failure(URLError(.badURL))
+    }
+    
+    do {
+        let (data, response) = try await URLSession.shared.data(from: tcUrl)
         
         guard let httpResponse = response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
