@@ -40,6 +40,12 @@ struct FoodTruckView: View {
             }
         } else {
             List {
+                Section {
+                    NavigationLink(destination: FoodTruckParticipantsView()) {
+                        Text("Participating Food Trucks")
+                    }
+                }
+                
                 ForEach(foodTruckEventsByDay, id: \.self) { day in
                     Section(
                         header: Text(visitingChefDateDisplay.string(from: day[0].date))

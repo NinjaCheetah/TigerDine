@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-struct IdentifiableURL: Identifiable {
-    let id = UUID()
-    let url: URL
-}
-
 struct VisitingChefsView: View {
     @Environment(DiningModel.self) var model
     

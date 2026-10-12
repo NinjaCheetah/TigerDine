@@ -22,6 +22,11 @@ struct SafariView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
+struct IdentifiableURL: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
 func getTCAPIFriendlyDateString(date: Date) -> String {
     let formatter = DateFormatter()
     formatter.calendar = Calendar(identifier: .iso8601)
