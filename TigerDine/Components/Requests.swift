@@ -40,7 +40,7 @@ func getAllDiningInfo(date: Date?) async -> Result<DiningLocationsParser, Error>
 }
 
 // Get information for just one dining location based on its location ID.
-func getSingleDiningInfo(date: String?, locId: Int) async -> Result<DiningLocationParser, Error> {
+func getSingleDiningInfo(date: String?, locId: Int) async -> Result<DiningLocationTCParser, Error> {
     // The current date and the location ID are required to get information for just one location.
     let dateString: String = date ?? getTCAPIFriendlyDateString(date: Date())
     let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-single?date=\(dateString)&locId=\(locId)"
@@ -58,7 +58,7 @@ func getSingleDiningInfo(date: String?, locId: Int) async -> Result<DiningLocati
             return .failure(InvalidHTTPError.invalid)
         }
         
-        let decoded = try JSONDecoder().decode(DiningLocationParser.self, from: data)
+        let decoded = try JSONDecoder().decode(DiningLocationTCParser.self, from: data)
         return .success(decoded)
     } catch {
         return .failure(error)

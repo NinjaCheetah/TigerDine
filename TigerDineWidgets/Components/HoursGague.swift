@@ -15,7 +15,7 @@ struct OpeningHoursGauge: View {
     
     private var barFillColor: Color {
         if let diningTimes = diningTimes {
-            let openStatus = parseMultiOpenStatus(diningTimes: diningTimes, referenceTime: referenceTime)
+            let openStatus = getMultiOpenStatus(diningTimes: diningTimes, referenceTime: referenceTime)
             switch openStatus {
             case .open:
                 return Color.green

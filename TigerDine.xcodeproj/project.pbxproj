@@ -55,11 +55,11 @@
 		374CDA742F10B24F00D8C50A /* Exceptions for "Shared" folder in "TigerDineWidgets" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Components/OpenStatuses.swift,
 				Components/SharedUtils.swift,
-				Components/TigerCenterParsers.swift,
 				Data/Constant/FDMPMealPeriods.swift,
 				Data/Constant/TCtoFDMPMap.swift,
-				Types/TigerCenterTypes.swift,
+				Types/DiningTypes.swift,
 			);
 			target = 374CDA572F10A19500D8C50A /* TigerDineWidgets */;
 		};
