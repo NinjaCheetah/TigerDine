@@ -4,14 +4,15 @@
 //
 //  Created by Campbell on 9/19/25.
 //
+//  Parsing functions to convert the intermediary TigerCenter parsing types into the final common
+//  types used in the app.
+//
 
 import Foundation
 
-
-
 /// Parses the JSON responses from the TigerCenter API into the format used throughout TigerDine.
-func parseLocationInfo(location: DiningLocationTCParser, forDate: Date?) -> DiningLocation {
-    print("beginning parse for \(location.name) (id: \(location.id))")
+func parseLocationInfoTC(location: DiningLocationTCParser, forDate: Date?) -> DiningLocation {
+    print("beginning parse for \(location.name) (id: \(location.id)) from TC API")
     
     // The descriptions sometimes have HTML <br /> tags despite also having \n. Those need to be
     // removed.
@@ -43,6 +44,7 @@ func parseLocationInfo(location: DiningLocationTCParser, forDate: Date?) -> Dini
             summary: location.summary,
             desc: desc,
             mapsUrl: mapsUrl,
+            websiteUrl: nil,
             date: forDate ?? Date(),
             diningTimes: nil,
             open: .closed,
@@ -101,6 +103,7 @@ func parseLocationInfo(location: DiningLocationTCParser, forDate: Date?) -> Dini
             summary: location.summary,
             desc: desc,
             mapsUrl: mapsUrl,
+            websiteUrl: nil,
             date: forDate ?? Date(),
             diningTimes: nil,
             open: .closed,
@@ -116,25 +119,8 @@ func parseLocationInfo(location: DiningLocationTCParser, forDate: Date?) -> Dini
     let now = Date()
     
     for i in 0..<openStrings.count {
-        let openParts = openStrings[i].split(separator: ":").map { Int($0) ?? 0 }
-        let openTimeComponents = DateComponents(hour: openParts[0], minute: openParts[1], second: openParts[2])
-        
-        let closeParts = closeStrings[i].split(separator: ":").map { Int($0) ?? 0 }
-        let closeTimeComponents = DateComponents(hour: closeParts[0], minute: closeParts[1], second: closeParts[2])
-        
-        openDates.append(calendar.date(
-            bySettingHour: openTimeComponents.hour!,
-            minute: openTimeComponents.minute!,
-            second: openTimeComponents.second!,
-            of: forDate ?? now)!
-        )
-        
-        closeDates.append(calendar.date(
-            bySettingHour: closeTimeComponents.hour!,
-            minute: closeTimeComponents.minute!,
-            second: closeTimeComponents.second!,
-            of: forDate ?? now)!
-        )
+        openDates.append(getDateFromTimeStr(timeStr: openStrings[i], forDate: forDate))
+        closeDates.append(getDateFromTimeStr(timeStr: closeStrings[i], forDate: forDate))
     }
     var diningTimes: [DiningTimes] = []
     for i in 0..<openDates.count {
@@ -272,41 +258,11 @@ func parseLocationInfo(location: DiningLocationTCParser, forDate: Date?) -> Dini
         summary: location.summary,
         desc: desc,
         mapsUrl: mapsUrl,
+        websiteUrl: nil,
         date: forDate ?? Date(),
         diningTimes: diningTimes,
         open: openStatus,
         visitingChefs: visitingChefs,
         dailySpecials: dailySpecials
     )
-}
-
-extension DiningLocation {
-    // Updates the open status of a location and of its visiting chefs, so that the labels in the
-    // UI update automatically as time progresses and locations open/close/etc.
-    mutating func updateOpenStatus() {
-        let now = Date()
-        // Gets the open status with the multi opening period compatible function.
-        self.open = getMultiOpenStatus(diningTimes: diningTimes, referenceTime: now)
-        if let visitingChefs = visitingChefs, !visitingChefs.isEmpty {
-            for i in visitingChefs.indices {
-                self.visitingChefs![i].status = switch getOpenStatus(
-                    openTime: visitingChefs[i].openTime,
-                    closeTime: visitingChefs[i].closeTime,
-                    referenceTime: now) {
-                case .open:
-                        .hereNow
-                case .closed:
-                    if now < visitingChefs[i].openTime {
-                        .arrivingLater
-                    } else {
-                        .gone
-                    }
-                case .openingSoon:
-                        .arrivingSoon
-                case .closingSoon:
-                        .leavingSoon
-                }
-            }
-        }
-    }
 }

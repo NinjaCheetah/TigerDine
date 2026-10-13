@@ -14,7 +14,7 @@ enum InvalidHTTPError: Error {
 // This code has now been mostly rewritten to be pretty and async instead of being horrifying
 // callback based code in a context where callback based code made no sense. I love async!
 // Get information for all dining locations.
-func getAllDiningInfo(date: Date?) async -> Result<DiningLocationsParser, Error> {
+func getAllDiningInfoTC(date: Date?) async -> Result<DiningLocationsParser, Error> {
     // The endpoint requires that you specify a date, so get today's if we don't have one.
     let dateString: String = getTCAPIFriendlyDateString(date: date ?? Date())
     let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=\(dateString)"
@@ -35,6 +35,30 @@ func getAllDiningInfo(date: Date?) async -> Result<DiningLocationsParser, Error>
         let decoded = try JSONDecoder().decode(DiningLocationsParser.self, from: data)
         return .success(decoded)
     } catch {
+        return .failure(error)
+    }
+}
+
+func getAllDiningInfoRM() async -> Result<[DiningLocationRMParser], Error> {
+    // This endpoint does *not* require a date, it fetches data for a 2 week span no matter what.
+    let urlString = "https://www.rit.edu/feeds/mobile-app/dining-all.php"
+    
+    guard let url = URL(string: urlString) else {
+        return .failure(URLError(.badURL))
+    }
+    
+    do {
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            return .failure(InvalidHTTPError.invalid)
+        }
+        
+        let decoded = try JSONDecoder().decode([DiningLocationRMParser].self, from: data)
+        return .success(decoded)
+    } catch {
+        print("hit an error: \(error)")
         return .failure(error)
     }
 }

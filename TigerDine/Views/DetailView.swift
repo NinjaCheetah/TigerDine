@@ -372,6 +372,7 @@ struct DetailView: View {
         summary: "Restaurant and Convenience Store",
         desc: "Located in the Crossroads building in Global Village, the Cafe and Market at Crossroads features a food court and convenience store. Inside of Crossroads are eight different food stations: grill, salad bar, pasta toss, pizza, Asian cuisine, deli, chef specials, and visiting chefs.\nThis location is cashless everyday after 7 p.m. Customers using cash may use a Tiger Spend Reload Station to add funds to an existing RIT ID card or a Reload Card.",
         mapsUrl: "https://maps.rit.edu/?mdo_id=123",
+        websiteUrl: "",
         date: Date(timeIntervalSince1970: 1776960000.0),
         diningTimes: [
             DiningTimes(

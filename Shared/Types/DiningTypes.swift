@@ -62,6 +62,7 @@ struct DiningLocation: Identifiable, Hashable, Codable {
     let summary: String
     let desc: String
     let mapsUrl: String
+    let websiteUrl: String?
     let date: Date
     let diningTimes: [DiningTimes]?
     var open: OpenStatus
