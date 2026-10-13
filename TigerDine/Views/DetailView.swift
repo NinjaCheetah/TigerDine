@@ -14,7 +14,7 @@ struct DetailView: View {
     @Environment(DiningModel.self) var model
     @Environment(\.openURL) private var openURL
     
-    @State private var showingSafari: Bool = false
+    @State private var safariUrl: IdentifiableURL?
     @State private var showingMenu: Bool = false
     @State private var occupancyLoading: Bool = true
     @State private var occupancyPercentage: Double = 0.0
@@ -198,7 +198,9 @@ struct DetailView: View {
             Section {
                 HStack {
                     Button(action: {
-                        showingSafari = true
+                        safariUrl = IdentifiableURL(
+                            url: URL(string: location.mapsUrl)!
+                        )
                     }) {
                         VStack(spacing: 4) {
                             Image(systemName: "map.fill")
@@ -215,6 +217,21 @@ struct DetailView: View {
                             VStack(spacing: 4) {
                                 Image(systemName: "menucard.fill")
                                 Text("Menu")
+                                    .font(.caption)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                    
+                    if let url = location.websiteUrl {
+                        Button(action: {
+                            safariUrl = IdentifiableURL(
+                                url: URL(string: url)!
+                            )
+                        }) {
+                            VStack(spacing: 4) {
+                                Image(systemName: "globe.fill")
+                                Text("Website")
                                     .font(.caption)
                             }
                             .frame(maxWidth: .infinity)
@@ -338,8 +355,8 @@ struct DetailView: View {
         .contentMargins(.top, 0)
         .navigationTitle("Details")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingSafari) {
-            SafariView(url: URL(string: location.mapsUrl)!)
+        .sheet(item: $safariUrl) { url in
+            SafariView(url: url.url)
         }
         .refreshable {
             do {
@@ -372,7 +389,7 @@ struct DetailView: View {
         summary: "Restaurant and Convenience Store",
         desc: "Located in the Crossroads building in Global Village, the Cafe and Market at Crossroads features a food court and convenience store. Inside of Crossroads are eight different food stations: grill, salad bar, pasta toss, pizza, Asian cuisine, deli, chef specials, and visiting chefs.\nThis location is cashless everyday after 7 p.m. Customers using cash may use a Tiger Spend Reload Station to add funds to an existing RIT ID card or a Reload Card.",
         mapsUrl: "https://maps.rit.edu/?mdo_id=123",
-        websiteUrl: "",
+        websiteUrl: "https://www.rit.edu/dining/location/cafe-and-market-crossroads",
         date: Date(timeIntervalSince1970: 1776960000.0),
         diningTimes: [
             DiningTimes(
