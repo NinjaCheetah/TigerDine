@@ -210,19 +210,6 @@ struct DetailView: View {
                         .frame(maxWidth: .infinity)
                     }
                     
-                    if location.fdmpIds != nil {
-                        Button(action: {
-                            showingMenu = true
-                        }) {
-                            VStack(spacing: 4) {
-                                Image(systemName: "menucard.fill")
-                                Text("Menu")
-                                    .font(.caption)
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                    }
-                    
                     if let url = location.websiteUrl {
                         Button(action: {
                             safariUrl = IdentifiableURL(
@@ -232,6 +219,19 @@ struct DetailView: View {
                             VStack(spacing: 4) {
                                 Image(systemName: "globe.fill")
                                 Text("Website")
+                                    .font(.caption)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                    
+                    if location.fdmpIds != nil {
+                        Button(action: {
+                            showingMenu = true
+                        }) {
+                            VStack(spacing: 4) {
+                                Image(systemName: "menucard.fill")
+                                Text("Menu")
                                     .font(.caption)
                             }
                             .frame(maxWidth: .infinity)

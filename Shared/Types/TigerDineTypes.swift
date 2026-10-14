@@ -1,5 +1,5 @@
 //
-//  DiningTypes.swift
+//  TigerDineTypes.swift
 //  TigerDine
 //
 //  Created by Campbell Bagley on 10/12/26.
@@ -75,4 +75,23 @@ struct WeeklyHours: Hashable {
     let day: String
     let date: Date
     let timeStrings: [String]
+}
+
+struct FoodTruckAvailability: Hashable {
+    let date: Date
+    let openTime: Date
+    let closeTime: Date
+    let mapsUrl: String
+    let locationName: String
+    let location: String
+}
+
+struct FoodTruck: Identifiable, Hashable {
+    let id: Int
+    let name: String
+    let description: String
+    let imageUrl: String
+    let imageAltTag: String
+    let url: String
+    let availability: [FoodTruckAvailability]
 }

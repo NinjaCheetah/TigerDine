@@ -144,7 +144,7 @@ func getFoodTruckPage() async -> Result<String, Error> {
     }
 }
 
-func getFoodTruckInfo() async -> Result<[FoodTruck], Error> {
+func getFoodTruckInfo() async -> Result<[FoodTruckRMParser], Error> {
     let urlString = "https://www.rit.edu/dining/feeds/mobile-app/food-trucks.php?showAll=1"
     print("making request to \(urlString)")
     
@@ -160,7 +160,7 @@ func getFoodTruckInfo() async -> Result<[FoodTruck], Error> {
             return .failure(InvalidHTTPError.invalid)
         }
         
-        let decoded = try JSONDecoder().decode([FoodTruck].self, from: data)
+        let decoded = try JSONDecoder().decode([FoodTruckRMParser].self, from: data)
         return .success(decoded)
     } catch {
         return .failure(error)

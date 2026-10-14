@@ -60,7 +60,7 @@
 				Data/Constant/FDMPMealPeriods.swift,
 				Data/Constant/LocationDescriptions.swift,
 				Data/Constant/TCtoFDMPMap.swift,
-				Types/DiningTypes.swift,
+				Types/TigerDineTypes.swift,
 			);
 			target = 374CDA572F10A19500D8C50A /* TigerDineWidgets */;
 		};
@@ -293,7 +293,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDineWidgets/TigerDineWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 54;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TigerDineWidgets/Info.plist;
@@ -326,7 +326,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDineWidgets/TigerDineWidgets.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 54;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TigerDineWidgets/Info.plist;
@@ -482,7 +482,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDine/TigerDine.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 54;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -519,7 +519,7 @@
 				CODE_SIGN_ENTITLEMENTS = TigerDine/TigerDine.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 54;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 5GF7GKNTK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;

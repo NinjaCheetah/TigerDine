@@ -10,8 +10,8 @@ import SafariServices
 import SwiftUI
 
 // Gross disgusting UIKit code :(
-// There isn't a direct way to use integrated Safari from SwiftUI, except maybe in iOS 26? I'm not targeting that though so I must fall
-// back on UIKit stuff.
+// There isn't a direct way to use integrated Safari from SwiftUI, except maybe in iOS 26? I'm not
+// targeting that though so I must fall back on UIKit stuff.
 struct SafariView: UIViewControllerRepresentable {
     let url: URL
 

@@ -15,13 +15,3 @@ struct FoodTruckEvent: Hashable {
     let location: String
     let trucks: [String]
 }
-
-struct FoodTruck: Decodable, Hashable {
-    let id: String
-    let title: String
-    let description: String
-    let imageUrl: String
-    let imageAltTag: String
-    let url: String
-    let datesAvailable: [String]
-}

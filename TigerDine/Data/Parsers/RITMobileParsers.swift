@@ -209,3 +209,39 @@ func parseLocationInfoRM(location: DiningLocationRMParser, forDate: Date?) -> Di
         dailySpecials: dailySpecials
     )
 }
+
+func parseFoodTruckInfoRM(truck: FoodTruckRMParser) -> FoodTruck {
+    var availability: [FoodTruckAvailability] = []
+    
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    
+    for dateAvailable in truck.datesAvailable {
+        // Get today's date to use for the availability and to combine with the timestamps.
+        let date = dateFormatter.date(from: dateAvailable.date)!
+        
+        let openTime = getDateFromTimeStr(timeStr: dateAvailable.startTime, forDate: date)
+        let closeTime = getDateFromTimeStr(timeStr: dateAvailable.endTime, forDate: date)
+        
+        availability.append(
+            FoodTruckAvailability(
+                date: date,
+                openTime: openTime,
+                closeTime: closeTime,
+                mapsUrl: dateAvailable.url,
+                locationName: dateAvailable.urlTitle,
+                location: dateAvailable.location
+            )
+        )
+    }
+    
+    return FoodTruck(
+        id: Int(truck.id)!, // This **SHOULD** always be okay??
+        name: truck.title,
+        description: truck.description,
+        imageUrl: truck.imageUrl,
+        imageAltTag: truck.imageAltTag,
+        url: truck.url,
+        availability: availability
+    )
+}

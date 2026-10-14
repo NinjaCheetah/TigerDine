@@ -95,3 +95,22 @@ struct DiningLocationRMParser: Identifiable, Hashable, Codable {
         url = (try? container.decode(String.self, forKey: .url)) ?? ""
     }
 }
+
+struct FoodTruckRMParser: Decodable, Hashable {
+    struct DatesAvailableRM: Decodable, Hashable {
+        let date: String
+        let startTime: String
+        let endTime: String
+        let url: String
+        let urlTitle: String
+        let location: String
+    }
+    
+    let id: String
+    let title: String
+    let description: String
+    let imageUrl: String
+    let imageAltTag: String
+    let url: String
+    let datesAvailable: [DatesAvailableRM]
+}
