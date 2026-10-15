@@ -106,23 +106,11 @@ class DiningModel {
         print("loading from network")
         await getDaysRepresented()
         var newLocationsByDay = [[DiningLocation]]()
-        for day in daysRepresented {
-//            switch await getAllDiningInfoTC(date: day) {
-//            case .success(let locations):
-//                var newDiningLocations = [DiningLocation]()
-//                for i in 0..<locations.locations.count {
-//                    let diningInfo = parseLocationInfoTC(
-//                        location: locations.locations[i],
-//                        forDate: day
-//                    )
-//                    newDiningLocations.append(diningInfo)
-//                }
-//                newLocationsByDay.append(newDiningLocations)
-//            case .failure(let error):
-//                throw(error)
-//            }
-            switch await getAllDiningInfoRM() {
-            case .success(let locations):
+        
+        // We only need one API request now instead of 7! Thank you RIT Mobile APIs.
+        switch await getAllDiningInfoRM() {
+        case .success(let locations):
+            for day in daysRepresented {
                 var newDiningLocations = [DiningLocation]()
                 for location in locations {
                     let diningInfo = parseLocationInfoRM(
@@ -132,11 +120,11 @@ class DiningModel {
                     newDiningLocations.append(diningInfo)
                 }
                 newLocationsByDay.append(newDiningLocations)
-            case .failure(let error):
-                throw(error)
             }
+        case .failure(let error):
+            throw(error)
         }
-        
+            
         // Encode all the locations as JSON.
         let encoder = JSONEncoder()
         let encodedLocationsByDay = try encoder.encode(newLocationsByDay)

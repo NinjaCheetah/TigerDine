@@ -42,6 +42,7 @@ func getAllDiningInfoTC(date: Date?) async -> Result<DiningLocationsParser, Erro
 func getAllDiningInfoRM() async -> Result<[DiningLocationRMParser], Error> {
     // This endpoint does *not* require a date, it fetches data for a 2 week span no matter what.
     let urlString = "https://www.rit.edu/feeds/mobile-app/dining-all.php"
+    print("making request to RIT Mobile API")
     
     guard let url = URL(string: urlString) else {
         return .failure(URLError(.badURL))
@@ -118,28 +119,6 @@ func getOccupancyPercentage(mdoId: Int) async -> Result<Double, Error> {
             return .failure(DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Failed to decode JSON")))
         }
     } catch {
-        return .failure(error)
-    }
-}
-
-// Get the RIT Events food truck page and strip it down to just the part of the HTML that we'll need to parse with SwiftSoup.
-func getFoodTruckPage() async -> Result<String, Error> {
-    let urlString = "https://www.rit.edu/events/weekend-food-trucks"
-    
-    guard let url = URL(string: urlString) else {
-        return .failure(URLError(.badURL))
-    }
-
-    do {
-        let contents = try String(contentsOf: url)
-        let scheduleRegex = /<div class=\".*?field--name-field-event-description.*?\">([\s\S]*?)<\/div>/
-        if let match = contents.firstMatch(of: scheduleRegex) {
-            print("successfully matched base food truck html")
-            return .success(String(match.0))
-        }
-        return .success(contents)
-    } catch {
-        print("failed to get base food truck html")
         return .failure(error)
     }
 }

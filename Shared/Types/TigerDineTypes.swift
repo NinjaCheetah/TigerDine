@@ -47,13 +47,15 @@ struct DailySpecial: Equatable, Hashable, Codable {
     let type: String
 }
 
-/// The IDs required to get the menu for a location from FD MealPlanner. Only present if the location appears in the map.
+/// The IDs required to get the menu for a location from FD MealPlanner. Only present if the
+/// location appears in the map.
 struct FDMPIds: Hashable, Codable {
     let locationId: Int
     let accountId: Int
 }
 
-/// The basic information about a dining location needed to display it in the app after parsing is finished.
+/// The basic information about a dining location needed to display it in the app after parsing
+/// is finished.
 struct DiningLocation: Identifiable, Hashable, Codable {
     let id: Int
     let mdoId: Int
@@ -70,13 +72,15 @@ struct DiningLocation: Identifiable, Hashable, Codable {
     let dailySpecials: [DailySpecial]?
 }
 
-/// Struct used to represent a day and its hours as strings. Type used for the hours of today and the next 6 days used in DetailView.
+/// Struct used to represent a day and its hours as strings. Type used for the hours of today and
+/// the next 6 days used in DetailView.
 struct WeeklyHours: Hashable {
     let day: String
     let date: Date
     let timeStrings: [String]
 }
 
+/// Struct to represent one event that a parent food truck is available at.
 struct FoodTruckAvailability: Hashable {
     let date: Date
     let openTime: Date
@@ -86,6 +90,7 @@ struct FoodTruckAvailability: Hashable {
     let location: String
 }
 
+/// Struct to represent a food truck with a list of events it's available at.
 struct FoodTruck: Identifiable, Hashable {
     let id: Int
     let name: String

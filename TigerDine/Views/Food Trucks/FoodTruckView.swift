@@ -25,7 +25,29 @@ struct FoodTruckView: View {
                     }
                 }
                 
-                ForEach(model.getDatesWithTrucks(), id: \.self) { date in
+                let datesWithTrucks = model.getDatesWithTrucks()
+                
+                // Fills the space when there are no food trucks scheduled.
+                if datesWithTrucks.isEmpty {
+                    Section {
+                        VStack(alignment: .center) {
+                            Image(systemName: "truck.box")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 75, height: 75)
+                                .foregroundStyle(.accent)
+                                .padding(.bottom, 8)
+                            Text("No food trucks are scheduled right now! Check back later.")
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+                    .listRowBackground(Color.clear)
+                }
+                
+                ForEach(datesWithTrucks, id: \.self) { date in
                     Section(
                         header: Text(visitingChefDateDisplay.string(from: date))
                     ) {
