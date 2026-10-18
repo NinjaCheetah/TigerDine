@@ -79,8 +79,10 @@ struct FoodTruckView: View {
                                         }) {
                                             Text(availability.locationName)
                                         }
-                                        Text(truck.description)
-                                            .foregroundStyle(.secondary)
+                                        if truck.description != "" {
+                                            Text(truck.description)
+                                                .foregroundStyle(.secondary)
+                                        }
                                     }
                                 }
                             }

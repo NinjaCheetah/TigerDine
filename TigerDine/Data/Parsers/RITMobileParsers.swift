@@ -154,6 +154,12 @@ func parseLocationInfoRM(location: DiningLocationRMParser, forDate: Date?) -> Di
             let openTime = getDateFromTimeStr(timeStr: chef.startTime, forDate: forDate)
             let closeTime = getDateFromTimeStr(timeStr: chef.endTime, forDate: forDate)
             
+            let desc = if chef.description == "" {
+                "No description available."
+            } else {
+                chef.description
+            }
+            
             // Parse the chef's status, mapping the OpenStatus to a VisitingChefStatus.
             let visitngChefStatus: VisitingChefStatus = switch getOpenStatus(openTime: openTime, closeTime: closeTime, referenceTime: now) {
             case .open:
@@ -172,7 +178,7 @@ func parseLocationInfoRM(location: DiningLocationRMParser, forDate: Date?) -> Di
             
             chefs.append(VisitingChef(
                 name: chef.name,
-                description: chef.description,
+                description: desc,
                 openTime: openTime,
                 closeTime: closeTime,
                 status: visitngChefStatus)

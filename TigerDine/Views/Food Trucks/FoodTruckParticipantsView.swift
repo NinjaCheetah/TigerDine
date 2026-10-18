@@ -22,8 +22,10 @@ struct FoodTruckParticipantsView: View {
                         .frame(width: 75, height: 75)
                     VStack(alignment: .leading) {
                         Text(truck.name)
-                        Text(truck.description)
-                            .foregroundStyle(.secondary)
+                        if truck.description != "" {
+                            Text(truck.description)
+                                .foregroundStyle(.secondary)
+                        }
                         Button(action: {
                             safariUrl = IdentifiableURL(
                                 url: URL(string: truck.url)!
