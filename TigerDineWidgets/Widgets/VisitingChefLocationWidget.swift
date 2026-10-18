@@ -133,7 +133,7 @@ struct VisitingChefLocationWidgetEntryView : View {
             
             if Calendar.current.isDateInToday(entry.date) {
                 if let diningTimes = entry.diningTimes {
-                    let openStatus = parseMultiOpenStatus(diningTimes: diningTimes, referenceTime: entry.date)
+                    let openStatus = getMultiOpenStatus(diningTimes: diningTimes, referenceTime: entry.date)
                     switch openStatus {
                     case .open:
                         Text("Open")

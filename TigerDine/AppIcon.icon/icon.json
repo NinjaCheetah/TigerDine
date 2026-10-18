@@ -6,8 +6,21 @@
     {
       "layers" : [
         {
-          "image-name" : "TigerDine Emblem Vector Paw.svg",
-          "name" : "TigerDine Emblem Vector Paw",
+          "hidden" : false,
+          "image-name" : "TigerDine Emblem Vector Paw Stripes 2.svg",
+          "name" : "TigerDine Emblem Vector Paw Stripes 2",
+          "position" : {
+            "scale" : 1.75,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "hidden" : false,
+          "image-name" : "TigerDine Emblem Vector Paw No Stripes 2.svg",
+          "name" : "TigerDine Emblem Vector Paw No Stripes 2",
           "position" : {
             "scale" : 1.75,
             "translation-in-points" : [

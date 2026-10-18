@@ -4,11 +4,13 @@
 //
 //  Created by Campbell on 9/2/25.
 //
+//  Types required to parse response data from the TigerCenter API endpoints.
+//
 
 import Foundation
 
 /// Struct to parse the response data from the TigerCenter API when getting the information for a dining location.
-struct DiningLocationParser: Decodable {
+struct DiningLocationTCParser: Decodable {
     /// An individual "event", which is just an open period for the location.
     struct Event: Decodable {
         /// Hour exceptions for the given event.
@@ -46,67 +48,7 @@ struct DiningLocationParser: Decodable {
 
 /// Struct that probably doesn't need to exist but this made parsing the list of location responses easy.
 struct DiningLocationsParser: Decodable {
-    let locations: [DiningLocationParser]
-}
-
-/// Enum to represent the four possible states a given location can be in.
-enum OpenStatus: Codable {
-    case open
-    case closed
-    case openingSoon
-    case closingSoon
-}
-
-/// An individual open period for a location.
-struct DiningTimes: Equatable, Hashable, Codable {
-    var openTime: Date
-    var closeTime: Date
-}
-
-/// Enum to represent the five possible states a visiting chef can be in.
-enum VisitingChefStatus: Codable {
-    case hereNow
-    case gone
-    case arrivingLater
-    case arrivingSoon
-    case leavingSoon
-}
-
-/// A visiting chef present at a location.
-struct VisitingChef: Equatable, Hashable, Codable {
-    let name: String
-    let description: String
-    var openTime: Date
-    var closeTime: Date
-    var status: VisitingChefStatus
-}
-
-/// A daily special at a location.
-struct DailySpecial: Equatable, Hashable, Codable {
-    let name: String
-    let type: String
-}
-
-/// The IDs required to get the menu for a location from FD MealPlanner. Only present if the location appears in the map.
-struct FDMPIds: Hashable, Codable {
-    let locationId: Int
-    let accountId: Int
-}
-
-/// The basic information about a dining location needed to display it in the app after parsing is finished.
-struct DiningLocation: Identifiable, Hashable, Codable {
-    let id: Int
-    let mdoId: Int
-    let fdmpIds: FDMPIds?
-    let name: String
-    let summary: String
-    let desc: String
-    let mapsUrl: String
-    let date: Date
-    let diningTimes: [DiningTimes]?
-    var open: OpenStatus
-    var visitingChefs: [VisitingChef]?
-    let dailySpecials: [DailySpecial]?
+    let locations: [DiningLocationTCParser]
 }
 
 /// Parser to read the occupancy data for a location.
@@ -127,11 +69,4 @@ struct DiningOccupancyParser: Decodable {
     let max_occ: Int
     let open_status: String
     let intra_loc_hours: [HourlyOccupancy]
-}
-
-/// Struct used to represent a day and its hours as strings. Type used for the hours of today and the next 6 days used in DetailView.
-struct WeeklyHours: Hashable {
-    let day: String
-    let date: Date
-    let timeStrings: [String]
 }

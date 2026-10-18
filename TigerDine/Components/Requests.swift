@@ -14,38 +14,18 @@ enum InvalidHTTPError: Error {
 // This code has now been mostly rewritten to be pretty and async instead of being horrifying
 // callback based code in a context where callback based code made no sense. I love async!
 // Get information for all dining locations.
-func getAllDiningInfo(date: Date?) async -> Result<DiningLocationsParser, Error> {
+func getAllDiningInfoTC(date: Date?) async -> Result<DiningLocationsParser, Error> {
     // The endpoint requires that you specify a date, so get today's if we don't have one.
     let dateString: String = getTCAPIFriendlyDateString(date: date ?? Date())
+    let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=\(dateString)"
 //    let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=2026-04-24"
-    let urlString = "http://tigerdine.ninjacheetah.dev/api/dining/dining-all?date=\(dateString)"
     
     guard let url = URL(string: urlString) else {
         return .failure(URLError(.badURL))
     }
-
+    
     do {
         let (data, response) = try await URLSession.shared.data(from: url)
-        
-        if let httpResponse = response as? HTTPURLResponse,
-              !(200...299).contains(httpResponse.statusCode) {
-            print("supplemental API request failed, will try TigerCenter directly")
-        }
-        
-        let decoded = try JSONDecoder().decode(DiningLocationsParser.self, from: data)
-        return .success(decoded)
-    } catch {
-        print("supplemental API request failed, will try TigerCenter directly")
-    }
-    
-    let tcUrlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-all?date=\(dateString)"
-    
-    guard let tcUrl = URL(string: tcUrlString) else {
-        return .failure(URLError(.badURL))
-    }
-    
-    do {
-        let (data, response) = try await URLSession.shared.data(from: tcUrl)
         
         guard let httpResponse = response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
@@ -59,8 +39,33 @@ func getAllDiningInfo(date: Date?) async -> Result<DiningLocationsParser, Error>
     }
 }
 
+func getAllDiningInfoRM() async -> Result<[DiningLocationRMParser], Error> {
+    // This endpoint does *not* require a date, it fetches data for a 2 week span no matter what.
+    let urlString = "https://www.rit.edu/feeds/mobile-app/dining-all.php"
+    print("making request to RIT Mobile API")
+    
+    guard let url = URL(string: urlString) else {
+        return .failure(URLError(.badURL))
+    }
+    
+    do {
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            return .failure(InvalidHTTPError.invalid)
+        }
+        
+        let decoded = try JSONDecoder().decode([DiningLocationRMParser].self, from: data)
+        return .success(decoded)
+    } catch {
+        print("hit an error: \(error)")
+        return .failure(error)
+    }
+}
+
 // Get information for just one dining location based on its location ID.
-func getSingleDiningInfo(date: String?, locId: Int) async -> Result<DiningLocationParser, Error> {
+func getSingleDiningInfo(date: String?, locId: Int) async -> Result<DiningLocationTCParser, Error> {
     // The current date and the location ID are required to get information for just one location.
     let dateString: String = date ?? getTCAPIFriendlyDateString(date: Date())
     let urlString = "https://tigercenter.rit.edu/tigerCenterApi/tc/dining-single?date=\(dateString)&locId=\(locId)"
@@ -78,15 +83,15 @@ func getSingleDiningInfo(date: String?, locId: Int) async -> Result<DiningLocati
             return .failure(InvalidHTTPError.invalid)
         }
         
-        let decoded = try JSONDecoder().decode(DiningLocationParser.self, from: data)
+        let decoded = try JSONDecoder().decode(DiningLocationTCParser.self, from: data)
         return .success(decoded)
     } catch {
         return .failure(error)
     }
 }
 
-// Get the occupancy information for a location using its MDO ID, whatever that stands for. This ID is provided alongside the other
-// main ID in the data returned by the TigerCenter API.
+// Get the occupancy information for a location using its MDO ID, whatever that stands for. This ID
+// is provided alongside the other main ID in the data returned by the TigerCenter API.
 func getOccupancyPercentage(mdoId: Int) async -> Result<Double, Error> {
     let urlString = "https://maps.rit.edu/proxySearch/densityMapDetail.php?mdo=\(mdoId)"
     print("making request to \(urlString)")
@@ -118,24 +123,25 @@ func getOccupancyPercentage(mdoId: Int) async -> Result<Double, Error> {
     }
 }
 
-// Get the RIT Events food truck page and strip it down to just the part of the HTML that we'll need to parse with SwiftSoup.
-func getFoodTruckPage() async -> Result<String, Error> {
-    let urlString = "https://www.rit.edu/events/weekend-food-trucks"
+func getFoodTruckInfo() async -> Result<[FoodTruckRMParser], Error> {
+    let urlString = "https://www.rit.edu/dining/feeds/mobile-app/food-trucks.php?showAll=1"
+    print("making request to \(urlString)")
     
     guard let url = URL(string: urlString) else {
         return .failure(URLError(.badURL))
     }
 
     do {
-        let contents = try String(contentsOf: url)
-        let scheduleRegex = /<div class=\".*?field--name-field-event-description.*?\">([\s\S]*?)<\/div>/
-        if let match = contents.firstMatch(of: scheduleRegex) {
-            print("successfully matched base food truck html")
-            return .success(String(match.0))
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            return .failure(InvalidHTTPError.invalid)
         }
-        return .success(contents)
+        
+        let decoded = try JSONDecoder().decode([FoodTruckRMParser].self, from: data)
+        return .success(decoded)
     } catch {
-        print("failed to get base food truck html")
         return .failure(error)
     }
 }

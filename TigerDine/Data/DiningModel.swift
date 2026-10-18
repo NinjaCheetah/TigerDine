@@ -106,23 +106,25 @@ class DiningModel {
         print("loading from network")
         await getDaysRepresented()
         var newLocationsByDay = [[DiningLocation]]()
-        for day in daysRepresented {
-            switch await getAllDiningInfo(date: day) {
-            case .success(let locations):
+        
+        // We only need one API request now instead of 7! Thank you RIT Mobile APIs.
+        switch await getAllDiningInfoRM() {
+        case .success(let locations):
+            for day in daysRepresented {
                 var newDiningLocations = [DiningLocation]()
-                for i in 0..<locations.locations.count {
-                    let diningInfo = parseLocationInfo(
-                        location: locations.locations[i],
+                for location in locations {
+                    let diningInfo = parseLocationInfoRM(
+                        location: location,
                         forDate: day
                     )
                     newDiningLocations.append(diningInfo)
                 }
                 newLocationsByDay.append(newDiningLocations)
-            case .failure(let error):
-                throw(error)
             }
+        case .failure(let error):
+            throw(error)
         }
-        
+            
         // Encode all the locations as JSON.
         let encoder = JSONEncoder()
         let encodedLocationsByDay = try encoder.encode(newLocationsByDay)
@@ -252,6 +254,37 @@ class DiningModel {
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+extension DiningLocation {
+    // Updates the open status of a location and of its visiting chefs, so that the labels in the
+    // UI update automatically as time progresses and locations open/close/etc.
+    mutating func updateOpenStatus() {
+        let now = Date()
+        // Gets the open status with the multi opening period compatible function.
+        self.open = getMultiOpenStatus(diningTimes: diningTimes, referenceTime: now)
+        if let visitingChefs = visitingChefs, !visitingChefs.isEmpty {
+            for i in visitingChefs.indices {
+                self.visitingChefs![i].status = switch getOpenStatus(
+                    openTime: visitingChefs[i].openTime,
+                    closeTime: visitingChefs[i].closeTime,
+                    referenceTime: now) {
+                case .open:
+                        .hereNow
+                case .closed:
+                    if now < visitingChefs[i].openTime {
+                        .arrivingLater
+                    } else {
+                        .gone
+                    }
+                case .openingSoon:
+                        .arrivingSoon
+                case .closingSoon:
+                        .leavingSoon
                 }
             }
         }
